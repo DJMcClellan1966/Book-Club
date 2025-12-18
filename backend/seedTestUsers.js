@@ -30,8 +30,36 @@ const testUsers = [
 
 async function seedTestUsers() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB');
+    // Determine MongoDB URI
+    let mongoURI = process.env.MONGODB_URI;
+    
+    if (!mongoURI || mongoURI === 'mongodb://localhost:27017/bookclub') {
+      // Try local MongoDB first
+      console.log('Attempting to connect to local MongoDB...');
+      mongoURI = 'mongodb://localhost:27017/bookclub';
+      
+      try {
+        await mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 3000 });
+        console.log('✅ Connected to local MongoDB');
+      } catch (localError) {
+        console.log('❌ Local MongoDB not available');
+        console.log('\n⚠️  MongoDB Setup Required:');
+        console.log('   Option 1: Install MongoDB locally');
+        console.log('   - Ubuntu: sudo apt install mongodb');
+        console.log('   - Mac: brew install mongodb-community');
+        console.log('   - Then: sudo systemctl start mongod');
+        console.log('\n   Option 2: Use MongoDB Atlas (free cloud)');
+        console.log('   - Sign up at: https://www.mongodb.com/cloud/atlas');
+        console.log('   - Get connection string');
+        console.log('   - Update MONGODB_URI in backend/.env\n');
+        process.exit(1);
+      }
+    } else {
+      // Use provided URI (Atlas or other)
+      console.log('Connecting to MongoDB...');
+      await mongoose.connect(mongoURI);
+      console.log('✅ Connected to MongoDB');
+    }
 
     for (const userData of testUsers) {
       // Check if user exists
