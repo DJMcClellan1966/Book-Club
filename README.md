@@ -1,2 +1,631 @@
-# Book-Club
+# Book Club Application
+
+A comprehensive full-stack application for book lovers to connect, share reviews, participate in discussions, and engage in video chats about books. Available on **Web**, **iOS**, and **Android**.
+
+## 🌟 Features
+
+### 📚 Book Management
+- **Search Books**: Integration with Google Books API to search and discover millions of books
+- **Reading Lists**: Track books you're currently reading, want to read, or have already read
+- **Book Details**: View comprehensive information about books including covers, descriptions, and metadata
+
+### ✍️ Reviews & Ratings
+- **Write Reviews**: Share detailed reviews with ratings (1-5 stars)
+- **Read Reviews**: Browse reviews from other community members
+- **Like & Comment**: Engage with reviews through likes and comments
+- **Average Ratings**: See community ratings for each book
+
+### 💬 Discussion Forums
+- **Create Forums**: Start topic-specific or book-specific discussion forums
+- **Forum Categories**: Organize discussions by general, book-discussion, recommendations, author-talk
+- **Post & Reply**: Share thoughts and reply to other members' posts
+- **Like Posts**: Show appreciation for valuable contributions
+
+### 🏠 Spaces (Discussion Rooms)
+- **Create Spaces**: Build temporary or permanent discussion spaces
+- **Text Chat**: Real-time messaging using Socket.io
+- **Video Chat**: WebRTC-powered video conversations with multiple participants
+- **Public/Private**: Control space visibility and access
+- **Auto-expire**: Temporary spaces automatically expire after 7 days
+
+### 👤 User Profiles
+- **Personal Profile**: Customize your profile with bio and avatar
+- **Follow System**: Follow other readers and build your network
+- **Activity Tracking**: View reading history and review contributions
+- **Dashboard**: Centralized view of your reading lists and activities
+
+### 🤖 AI-Powered Features
+- **Content Moderation**: Automatic AI moderation of forum posts and space messages to maintain community standards
+- **Smart Book Recommendations**: Personalized book suggestions based on your reading history using AI
+- **Reading Insights**: AI-generated insights about your reading habits and preferences
+- **Severity Detection**: Multi-level moderation with warnings for borderline content and blocks for severe violations
+- **AI Character & Author Chats**: Have conversations with your favorite authors and book characters
+- **Personality Simulation**: AI creates authentic character/author personalities for engaging discussions
+- **Video Avatars**: Animated video responses for Premium/Pro subscribers (coming soon)
+
+### 💰 Monetization Features
+- **Subscription Tiers**: Free, Premium ($9.99/mo), and Pro ($19.99/mo) plans
+  - Free: 2 AI chats, 20 messages/day
+  - Premium: 10 AI chats, 100 messages/day, video avatars
+  - Pro: Unlimited AI chats and messages, video avatars
+- **Stripe Integration**: Secure payment processing with 7-day free trials
+- **Feature Gates**: Premium features like ad-free experience, enhanced AI, unlimited lists
+- **Affiliate Links**: Earn commissions through Amazon, Bookshop.org, and Barnes & Noble
+- **Billing Portal**: Self-service subscription management for users
+- **Webhook Automation**: Automated subscription lifecycle handling
+
+## 🛠️ Technology Stack
+
+### Backend
+- **Node.js** & **Express**: RESTful API server
+- **MongoDB** & **Mongoose**: Database and ODM
+- **Socket.io**: Real-time WebSocket communication
+- **JWT**: Secure authentication
+- **bcryptjs**: Password hashing
+- **Google Books API**: Book data integration
+- **OpenAI API**: AI-powered content moderation and recommendations
+- **Stripe**: Payment processing and subscription management
+
+### Frontend
+- **React 18**: UI framework
+- **React Router**: Client-side routing
+- **Socket.io-client**: Real-time communication
+- **Simple Peer**: WebRTC video chat implementation
+- **Axios**: HTTP client
+- **Context API**: State management
+- **Stripe.js & React Stripe**: Payment UI components
+
+## 📋 Prerequisites
+
+### For Web Application
+- Node.js (v14 or higher)
+- MongoDB (v4.4 or higher)
+- npm or yarn package manager
+- Modern web browser with WebRTC support
+
+### For Mobile Apps (Optional)
+- Node.js (v14 or higher)
+- Expo CLI: `npm install -g expo-cli`
+- For iOS: macOS with Xcode, Apple Developer Account
+- For Android: Android Studio, Google Play Developer Account
+- Physical device or emulator for testing
+
+## 🚀 Installation & Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd Book-Club
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Edit .env with your configuration
+# Required variables:
+# - MONGODB_URI (your MongoDB connection string)
+# - JWT_SECRET (generate a secure random string)
+# - PORT (default: 5000)
+# - CLIENT_URL (default: http://localhost:3000)
+# - FRONTEND_URL (default: http://localhost:3000)
+# - GOOGLE_BOOKS_API_KEY (optional, for enhanced book search)
+# - OPENAI_API_KEY (optional but recommended, for AI moderation and recommendations)
+# - STRIPE_SECRET_KEY (optional, for payment processing)
+# - STRIPE_WEBHOOK_SECRET (optional, for webhook verification)
+# - STRIPE_PREMIUM_PRICE_ID (optional, for premium subscription)
+# - STRIPE_PRO_PRICE_ID (optional, for pro subscription)
+```
+
+### 3. Frontend Setup
+
+```bash
+cd ../frontend
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Edit .env with your configuration
+# Required variables:
+# - REACT_APP_API_URL=http://localhost:5000/api
+# - REACT_APP_SOCKET_URL=http://localhost:5000
+# - REACT_APP_STRIPE_PUBLISHABLE_KEY (optional, for payment UI)
+```
+
+### 4. Start MongoDB
+
+Make sure MongoDB is running on your system:
+
+```bash
+# Using MongoDB service
+sudo systemctl start mongod
+
+# Or using Docker
+docker run -d -p 27017:27017 --name mongodb mongo:latest
+```
+
+### 5. Run the Application
+
+**Terminal 1 - Start Backend:**
+```bash
+cd backend
+npm run dev
+# Server will run on http://localhost:5000
+```
+
+**Terminal 2 - Start Web Frontend:**
+```bash
+cd frontend
+npm start
+# App will open at http://localhost:3000
+```
+
+**Terminal 3 - Start Mobile App (Optional):**
+```bash
+cd mobile
+npm start
+# Follow instructions to run on iOS/Android
+# See mobile/README.md for detailed instructions
+```
+
+## 📱 Usage Guide
+
+### Getting Started
+
+1. **Register**: Create a new account on the registration page
+2. **Login**: Sign in with your credentials
+3. **Explore**: Browse books, forums, and spaces
+
+### Managing Books
+
+1. Navigate to **Books** page
+2. Search for books using the search bar
+3. Click on a book to view details
+4. Add books to your reading lists:
+   - Currently Reading
+   - Want to Read
+   - Already Read
+
+### Writing Reviews
+
+1. Go to a book's detail page
+2. Click **Write a Review**
+3. Select a rating (1-5 stars)
+4. Write your review title and content
+5. Submit your review
+
+### Participating in Forums
+
+1. Navigate to **Forums** page
+2. Click **Create Forum** to start a new discussion
+3. Click on any forum to view posts
+4. Click **Join Forum** to become a member
+5. Add posts and replies
+
+### Using Spaces
+
+1. Navigate to **Spaces** page
+2. Click **Create Space** to start a new space
+3. Choose space type (permanent/temporary) and visibility
+4. Enable video chat if needed
+5. Join a space to participate in text or video discussions
+
+### Managing Subscriptions
+
+1. Navigate to **Pricing** page to view subscription options
+2. Select a plan (Premium or Pro) and click upgrade
+3. Enter payment details at checkout
+4. Start your 7-day free trial
+5. Manage subscription in **Billing** page:
+   - View current plan and features
+   - Update payment method
+   - Cancel or reactivate subscription
+   - View payment history
+
+### Purchasing Books (Affiliate Links)
+
+1. View any book detail page
+2. Scroll to "Buy this book" section
+3. Click preferred retailer button:
+   - Amazon
+   - Bookshop.org
+   - Barnes & Noble
+4. Complete purchase on retailer site
+
+### Video Chat
+
+1. Join a space with video enabled
+2. Click **Join Video Chat**
+3. Allow browser permissions for camera and microphone
+4. Use controls to toggle video/audio or leave the call
+
+### AI Character & Author Chats
+
+1. Navigate to **AI Chats** page
+2. Click the **+** button to create a new chat
+3. Select chat type:
+   - **Author**: Chat with famous authors about their work and writing style
+   - **Character**: Talk to book characters about their stories
+4. Enter the character/author name
+5. (Optional) Add book title for more context
+6. (Premium/Pro) Enable video avatar for animated responses
+7. Start chatting! The AI will respond in character
+8. View usage limits in the sidebar (upgrade for more)
+
+## 🔧 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/me` - Get current user
+
+### Books
+- `GET /api/books` - Get all books
+- `GET /api/books/search?query=` - Search books
+- `GET /api/books/:id` - Get book details
+- `POST /api/books` - Add book to database
+
+### Reviews
+- `GET /api/reviews/book/:bookId` - Get book reviews
+- `GET /api/reviews/user/:userId` - Get user reviews
+- `POST /api/reviews` - Create review
+- `PUT /api/reviews/:id` - Update review
+- `DELETE /api/reviews/:id` - Delete review
+- `POST /api/reviews/:id/like` - Like review
+
+### Forums
+- `GET /api/forums` - Get all forums
+- `GET /api/forums/:id` - Get forum details
+- `POST /api/forums` - Create forum
+- `POST /api/forums/:id/join` - Join forum
+- `POST /api/forums/:id/posts` - Add post
+
+### Spaces
+- `GET /api/spaces` - Get all spaces
+- `GET /api/spaces/:id` - Get space details
+- `POST /api/spaces` - Create space
+- `POST /api/spaces/:id/join` - Join space
+- `POST /api/spaces/:id/messages` - Send message
+
+### Users
+- `GET /api/users/:id` - Get user profile
+- `PUT /api/users/profile` - Update profile
+- `POST /api/users/reading-list/:listType` - Add to reading list
+- `POST /api/users/:id/follow` - Follow user
+- `GET /api/users/recommendations` - Get AI book recommendations
+- `GET /api/users/reading-insights` - Get AI reading insights
+
+### Payments & Subscriptions
+- `GET /api/payments/pricing` - Get subscription pricing tiers
+- `GET /api/payments/subscription` - Get current user subscription
+- `POST /api/payments/subscribe` - Create new subscription
+- `POST /api/payments/cancel` - Cancel subscription
+- `POST /api/payments/reactivate` - Reactivate subscription
+- `POST /api/payments/update-tier` - Change subscription tier
+- `GET /api/payments/payments` - Get payment history
+- `POST /api/payments/portal` - Create billing portal session
+- `POST /api/payments/webhook` - Stripe webhook handler
+
+### Affiliate Links
+- `GET /api/affiliates/book/:bookId/link/:platform` - Generate affiliate link
+- `POST /api/affiliates/track-click` - Track affiliate click
+- `GET /api/affiliates/stats` - Get affiliate statistics (admin)
+- `GET /api/affiliates/book/:bookId/platforms` - Get available platforms
+
+### AI Character & Author Chats
+- `GET /api/aichats/my-chats` - Get all user's AI chat sessions
+- `POST /api/aichats/create` - Create new AI character/author chat
+- `POST /api/aichats/:chatId/message` - Send message to AI character
+- `DELETE /api/aichats/:chatId` - Delete AI chat session
+- `GET /api/aichats/limits/current` - Get current usage and tier limits
+
+## 🎨 Project Structure
+
+```
+Book-Club/
+├── backend/             # Node.js/Express API server
+│   ├── models/          # MongoDB schemas
+│   │   ├── User.js
+│   │   ├── Book.js
+│   │   ├── Review.js
+│   │   ├── Forum.js
+│   │   ├── Space.js
+│   │   ├── Subscription.js
+│   │   ├── Payment.js
+│   │   ├── AffiliateClick.js
+│   │   ├── AIChat.js
+│   │   └── ChatMessage.js
+│   ├── routes/          # API routes
+│   │   ├── auth.js
+│   │   ├── books.js
+│   │   ├── reviews.js
+│   │   ├── forums.js
+│   │   ├── spaces.js
+│   │   ├── users.js
+│   │   ├── payments.js
+│   │   ├── affiliates.js
+│   │   └── aichats.js
+│   ├── middleware/      # Custom middleware
+│   │   ├── auth.js
+│   │   └── subscription.js
+│   ├── services/        # Business logic services
+│   │   ├── aiService.js
+│   │   └── stripeService.js
+│   ├── server.js        # Express server & Socket.io
+│   └── package.json
+│
+├── frontend/            # React web application
+│   ├── public/
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/  # Reusable components
+│   │   │   ├── Navbar.js
+│   │   │   ├── BookCard.js
+│   │   │   ├── VideoChat.js
+│   │   │   └── ChatInterface.js
+│   │   ├── pages/       # Page components
+│   │   │   ├── Home.js
+│   │   │   ├── Login.js
+│   │   │   ├── Register.js
+│   │   │   ├── Books.js
+│   │   │   ├── BookDetail.js
+│   │   │   ├── Forums.js
+│   │   │   ├── ForumDetail.js
+│   │   │   ├── Spaces.js
+│   │   │   ├── SpaceDetail.js
+│   │   │   ├── Dashboard.js
+│   │   │   ├── Profile.js
+│   │   │   ├── Pricing.js
+│   │   │   ├── Checkout.js
+│   │   │   ├── Billing.js
+│   │   │   └── AIChats.js
+│   │   ├── context/     # React Context
+│   │   │   ├── AuthContext.js
+│   │   │   └── SocketContext.js
+│   │   ├── App.js
+│   │   └── index.js
+│   └── package.json
+│
+└── mobile/              # React Native mobile apps (iOS & Android)
+    ├── src/
+    │   ├── screens/     # Mobile screens
+    │   │   ├── auth/    # Login, Register
+    │   │   ├── HomeScreen.js
+    │   │   ├── BooksScreen.js
+    │   │   ├── ForumsScreen.js
+    │   │   ├── SpacesScreen.js
+    │   │   ├── ProfileScreen.js
+    │   │   └── AIChatsScreen.js
+    │   ├── components/  # Reusable mobile components
+    │   ├── navigation/  # React Navigation setup
+    │   ├── context/     # Auth context
+    │   ├── services/    # API & Socket services
+    │   ├── constants/   # Colors, spacing, config
+    │   └── utils/       # Helper functions
+    ├── app.json         # Expo configuration
+    ├── eas.json         # Build configuration
+    ├── App.js           # Entry point
+    └── package.json
+    │   ├── App.js
+    │   └── index.js
+    └── package.json
+```
+
+## 🔐 Security Features
+
+- Password hashing with bcryptjs
+- JWT-based authentication
+- Protected routes and API endpoints
+- Input validation
+- Secure WebSocket connections
+- AI-powered content moderation to prevent inappropriate content
+
+## 🎥 WebRTC Video Chat
+
+The application uses Simple Peer library for WebRTC peer-to-peer video connections:
+- Multiple participants support
+- Camera and microphone toggle
+- Automatic peer connection handling
+- Socket.io signaling server
+
+## 🌐 Environment Variables
+
+### Backend (.env)
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/bookclub
+JWT_SECRET=your_secure_random_string_here
+CLIENT_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3000
+GOOGLE_BOOKS_API_KEY=your_api_key_optional
+OPENAI_API_KEY=your_openai_api_key_for_ai_features
+
+# Payment Processing (Optional - for monetization)
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+STRIPE_PREMIUM_PRICE_ID=price_premium_id_from_stripe
+STRIPE_PRO_PRICE_ID=price_pro_id_from_stripe
+
+# Affiliate Links (Optional - for book purchases)
+AMAZON_AFFILIATE_TAG=your-tag-20
+BOOKSHOP_AFFILIATE_TAG=your-tag
+BN_AFFILIATE_TAG=your-tag
+```
+
+**Notes:**
+- **AI Features**: App works without OpenAI API key, but AI moderation and recommendations will be disabled
+- **Stripe**: Required only if you want to enable paid subscriptions
+- **Affiliate Tags**: Required only if you want to earn commissions from book purchases
+- See [MONETIZATION.md](MONETIZATION.md) for detailed payment setup instructions
+
+### Frontend (.env)
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_SOCKET_URL=http://localhost:5000
+REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
+```
+
+## 🐛 Troubleshooting
+
+### MongoDB Connection Issues
+- Ensure MongoDB is running: `sudo systemctl status mongod`
+- Check connection string in `.env`
+- Verify MongoDB port (default: 27017)
+
+### WebRTC/Video Issues
+- Allow browser permissions for camera/microphone
+- Ensure HTTPS in production (required for WebRTC)
+- Check firewall settings for WebRTC ports
+
+### Socket.io Connection Issues
+- Verify `REACT_APP_SOCKET_URL` matches backend URL
+- Check CORS configuration in backend
+- Ensure WebSocket support in your network
+
+### AI Features Not Working
+- Verify `OPENAI_API_KEY` is set in backend `.env`
+- Check API key has sufficient credits and permissions
+- Review backend logs for AI service errors
+- App continues to work without AI, providing default recommendations
+
+### Payment/Subscription Issues
+- Verify Stripe API keys are correct (test vs production)
+- Check webhook endpoint is accessible
+- Use Stripe test cards for development
+- Review Stripe dashboard for payment errors
+- See [MONETIZATION.md](MONETIZATION.md) for detailed troubleshooting
+
+### Affiliate Links Not Working
+- Ensure books have ISBN information
+- Verify affiliate tags are configured
+- Check browser isn't blocking popups
+- Test links manually to verify formatting
+
+### AI Chat Issues
+- Check OpenAI API key is valid and has credits
+- Verify subscription tier allows AI chats
+- Check daily message limit hasn't been exceeded
+- Review character/author name spelling
+- For video avatars, ensure Premium or Pro tier is active
+
+## 📝 Development
+
+### Running Tests
+```bash
+# Backend tests
+cd backend
+npm test
+
+# Frontend tests
+cd frontend
+npm test
+```
+
+### Building for Production
+
+**Backend:**
+```bash
+cd backend
+npm start
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm run build
+# Serve the build folder with a static server
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 📚 Additional Documentation
+
+- **[mobile/README.md](mobile/README.md)** - Complete guide to building and deploying mobile apps
+- **[MONETIZATION.md](MONETIZATION.md)** - Complete guide to payment processing, subscriptions, and affiliate links
+- **[AI_FEATURES.md](AI_FEATURES.md)** - Detailed documentation on AI moderation and recommendations
+- **[AI_CHAT_GUIDE.md](AI_CHAT_GUIDE.md)** - Complete guide to AI character and author chat feature
+
+## 📱 Mobile Applications
+
+The Book Club app is available as native iOS and Android applications built with React Native and Expo.
+
+### Features
+- ✅ Full authentication (login/register)
+- ✅ Browse and search books
+- ✅ View book details and reviews
+- ✅ Access forums and discussions
+- ✅ Join spaces and chat
+- ✅ AI character/author conversations
+- ✅ Profile management
+- ✅ Subscription management
+- ✅ Native mobile UI/UX
+- ✅ Offline capabilities
+- ✅ Push notifications (configurable)
+
+### Quick Start (Mobile)
+
+```bash
+# Navigate to mobile directory
+cd mobile
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Run on iOS simulator (macOS only)
+npm run ios
+
+# Run on Android emulator
+npm run android
+
+# For physical devices, scan QR code with Expo Go app
+```
+
+### Production Builds
+
+See [mobile/README.md](mobile/README.md) for detailed instructions on:
+- Building production APK/AAB for Android
+- Building production IPA for iOS
+- Submitting to Google Play Store
+- Submitting to Apple App Store
+- Required assets and configurations
+- Testing and deployment strategies
+
+## 🙏 Acknowledgments
+
+- Google Books API for book data
+- Socket.io for real-time communication
+- Simple Peer for WebRTC implementation
+- MongoDB and Mongoose for database management
+- React and the React community
+- React Native and Expo for mobile development
+- Stripe for payment processing infrastructure
+- OpenAI for AI-powered features
+
+## 📧 Support
+
+For support, please open an issue in the repository or contact the development team.
+
+---
+
+**Happy Reading! 📚**
 A place where people can connect and talk about their favorite books

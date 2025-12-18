@@ -1,0 +1,276 @@
+.billing-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.billing-container h1 {
+  font-size: 36px;
+  margin-bottom: 30px;
+  color: #1a1a1a;
+}
+
+.billing-section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.billing-section h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+}
+
+.subscription-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.subscription-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.tier-free {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.tier-premium {
+  background: #4CAF50;
+  color: white;
+}
+
+.tier-pro {
+  background: #2196F3;
+  color: white;
+}
+
+.subscription-status {
+  font-size: 15px;
+  color: #444;
+}
+
+.status-active,
+.status-trialing {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.status-canceled,
+.status-past_due {
+  color: #f44336;
+  font-weight: 600;
+}
+
+.billing-period {
+  font-size: 14px;
+  color: #666;
+}
+
+.cancel-notice {
+  color: #f44336;
+  font-weight: 600;
+}
+
+.trial-notice {
+  padding: 8px 12px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.subscription-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subscription-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-cancel {
+  background: #f44336;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #d32f2f;
+}
+
+.btn-reactivate {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-reactivate:hover {
+  background: #45a049;
+}
+
+.btn-upgrade {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-upgrade:hover {
+  background: #45a049;
+}
+
+.btn-change {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-change:hover {
+  background: #1976d2;
+}
+
+.btn-manage {
+  background: #757575;
+  color: white;
+}
+
+.btn-manage:hover {
+  background: #616161;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.feature-icon {
+  font-size: 24px;
+}
+
+.feature-name {
+  flex: 1;
+  font-size: 14px;
+  color: #444;
+}
+
+.feature-value {
+  font-weight: 700;
+  color: #4CAF50;
+  font-size: 16px;
+}
+
+.payments-table {
+  overflow-x: auto;
+}
+
+.payments-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payments-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.payments-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #444;
+}
+
+.payment-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.payment-status.status-succeeded {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.payment-status.status-failed {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.payment-status.status-pending {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.billing-loading {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .subscription-card {
+    flex-direction: column;
+  }
+
+  .subscription-actions {
+    width: 100%;
+  }
+
+  .subscription-actions button {
+    width: 100%;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payments-table {
+    font-size: 14px;
+  }
+
+  .payments-table th,
+  .payments-table td {
+    padding: 8px;
+  }
+}
