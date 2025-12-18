@@ -1,12 +1,13 @@
 import { Platform } from 'react-native';
 
 // API Configuration
+// Replace 192.168.x.x with your computer's actual IP address
 export const API_URL = __DEV__ 
-  ? 'http://localhost:5000/api'  // Development
+  ? 'http://192.168.1.100:5000/api'  // Development - UPDATE THIS IP
   : 'https://your-production-api.com/api'; // Production
 
 export const SOCKET_URL = __DEV__
-  ? 'http://localhost:5000'
+  ? 'http://192.168.1.100:5000'  // Development - UPDATE THIS IP
   : 'https://your-production-api.com';
 
 // App Colors

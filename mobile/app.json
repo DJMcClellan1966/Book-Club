@@ -45,20 +45,6 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": [
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow Book Club to access your camera"
-        }
-      ],
-      [
-        "expo-av",
-        {
-          "microphonePermission": "Allow Book Club to access your microphone"
-        }
-      ]
-    ],
     "extra": {
       "eas": {
         "projectId": "your-project-id-here"
