@@ -11,20 +11,54 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.supabase';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants';
+
+// Password validation helper
+const validatePassword = (password) => {
+  const errors = [];
+  
+  if (password.length < 8) {
+    errors.push('at least 8 characters');
+  }
+  if (password.length > 128) {
+    errors.push('maximum 128 characters');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('one uppercase letter');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('one lowercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('one number');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('one special character (!@#$%^&*...)');
+  }
+  
+  return errors;
+};
 
 const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
 
   const handleRegister = async () => {
-    if (!username || !email || !password || !confirmPassword) {
+    if (!username || !email || !phone || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    // Validate phone number (basic validation)
+    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+      Alert.alert('Error', 'Please enter a valid phone number');
       return;
     }
 
@@ -33,17 +67,28 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+    // Validate password strength
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      Alert.alert(
+        'Weak Password',
+        'Password must contain:\n• ' + passwordErrors.join('\n• ')
+      );
       return;
     }
 
     setLoading(true);
-    const result = await register(username, email, password);
-    setLoading(false);
-
-    if (!result.success) {
-      Alert.alert('Registration Failed', result.message);
+    try {
+      await register(email, password, username, phone);
+      setLoading(false);
+      Alert.alert(
+        'Check Your Email',
+        'We sent you a verification link. Please check your email and click the link to verify your account before logging in.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
+    } catch (error) {
+      setLoading(false);
+      Alert.alert('Registration Failed', error.message || 'An error occurred during registration');
     }
   };
 
@@ -59,42 +104,72 @@ const RegisterScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            editable={!loading}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your username"
+              placeholderTextColor={COLORS.textSecondary}
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              editable={!loading}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            editable={!loading}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email address"
+              placeholderTextColor={COLORS.textSecondary}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              editable={!loading}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            editable={!loading}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="+1 234 567 8900"
+              placeholderTextColor={COLORS.textSecondary}
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              editable={!loading}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            editable={!loading}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="8+ chars, uppercase, lowercase, number, symbol"
+              placeholderTextColor={COLORS.textSecondary}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!loading}
+              maxLength={128}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Re-enter your password"
+              placeholderTextColor={COLORS.textSecondary}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              editable={!loading}
+            />
+          </View>
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
@@ -146,14 +221,23 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
+  inputContainer: {
+    marginBottom: SPACING.md,
+  },
+  label: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.text,
+    fontWeight: '600',
+    marginBottom: SPACING.xs,
+  },
   input: {
     backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
     padding: SPACING.md,
-    marginBottom: SPACING.md,
     fontSize: 16,
+    color: COLORS.text,
   },
   button: {
     backgroundColor: COLORS.primary,

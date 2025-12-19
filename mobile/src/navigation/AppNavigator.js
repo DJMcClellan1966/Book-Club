@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.supabase';
 import { COLORS } from '../constants';
 
 // Auth Screens
@@ -21,6 +21,8 @@ import SpaceDetailScreen from '../screens/SpaceDetailScreen';
 import AIChatsScreen from '../screens/AIChatsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import PricingScreen from '../screens/PricingScreen';
+import TwoFactorSetupScreen from '../screens/TwoFactorSetupScreen';
+import BookReadersScreen from '../screens/BookReadersScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +95,11 @@ const BooksStack = () => (
       name="BookDetail" 
       component={BookDetailScreen}
       options={{ title: 'Book Details' }}
+    />
+    <Stack.Screen 
+      name="BookReaders" 
+      component={BookReadersScreen}
+      options={{ title: 'Connect with Readers' }}
     />
   </Stack.Navigator>
 );
@@ -167,6 +174,11 @@ const ProfileStack = () => (
       name="AIChats" 
       component={AIChatsScreen}
       options={{ title: 'AI Chats' }}
+    />
+    <Stack.Screen 
+      name="TwoFactorSetup" 
+      component={TwoFactorSetupScreen}
+      options={{ title: 'Two-Factor Authentication' }}
     />
   </Stack.Navigator>
 );

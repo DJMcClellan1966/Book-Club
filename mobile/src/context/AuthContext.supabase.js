@@ -64,10 +64,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, username) => {
+  const register = async (email, password, username, phoneNumber) => {
     setLoading(true);
     try {
-      const data = await authAPI.register(email, password, username);
+      const data = await authAPI.register(email, password, username, phoneNumber);
       setSession(data.session);
       
       // Load full user profile
@@ -80,6 +80,44 @@ export const AuthProvider = ({ children }) => {
       throw error;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const enable2FA = async () => {
+    try {
+      const data = await authAPI.enable2FA();
+      return data;
+    } catch (error) {
+      console.error('Enable 2FA error:', error);
+      throw error;
+    }
+  };
+
+  const verify2FA = async (factorId, code) => {
+    try {
+      const data = await authAPI.verify2FA(factorId, code);
+      // Update user profile to reflect 2FA enabled
+      await authAPI.updateProfile({ two_factor_enabled: true });
+      const currentUser = await authAPI.getCurrentUser();
+      setUser(currentUser);
+      return data;
+    } catch (error) {
+      console.error('Verify 2FA error:', error);
+      throw error;
+    }
+  };
+
+  const disable2FA = async (factorId) => {
+    try {
+      const data = await authAPI.disable2FA(factorId);
+      // Update user profile
+      await authAPI.updateProfile({ two_factor_enabled: false });
+      const currentUser = await authAPI.getCurrentUser();
+      setUser(currentUser);
+      return data;
+    } catch (error) {
+      console.error('Disable 2FA error:', error);
+      throw error;
     }
   };
 
@@ -118,6 +156,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUser,
     getAccessToken,
+    enable2FA,
+    verify2FA,
+    disable2FA,
     isAuthenticated: !!user,
   };
 

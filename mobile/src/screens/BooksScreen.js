@@ -9,8 +9,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { booksAPI } from '../services/api';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { booksAPI } from '../services/supabase';
+import { COLORS, SPACING, TYPOGRAPHY, SHADOWS } from '../constants';
 
 const BooksScreen = ({ navigation }) => {
   const [books, setBooks] = useState([]);
@@ -24,8 +24,8 @@ const BooksScreen = ({ navigation }) => {
 
   const loadBooks = async () => {
     try {
-      const response = await booksAPI.getAll({ page, limit: 20 });
-      setBooks(response.data.books);
+      const response = await booksAPI.getAll(page, 20);
+      setBooks(response.books || []);
     } catch (error) {
       console.error('Error loading books:', error);
     } finally {
@@ -41,8 +41,8 @@ const BooksScreen = ({ navigation }) => {
     
     try {
       setLoading(true);
-      const response = await booksAPI.search(searchQuery);
-      setBooks(response.data.books);
+      const results = await booksAPI.search(searchQuery);
+      setBooks(results || []);
     } catch (error) {
       console.error('Error searching books:', error);
     } finally {
@@ -53,7 +53,7 @@ const BooksScreen = ({ navigation }) => {
   const renderBook = ({ item }) => (
     <TouchableOpacity
       style={styles.bookCard}
-      onPress={() => navigation.navigate('BookDetail', { bookId: item._id })}
+      onPress={() => navigation.navigate('BookDetail', { bookId: item.id })}
     >
       <View style={styles.bookIcon}>
         <Ionicons name="book" size={30} color={COLORS.primary} />

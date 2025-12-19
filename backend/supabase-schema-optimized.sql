@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
+  phone_number TEXT,
+  two_factor_enabled BOOLEAN DEFAULT FALSE,
   bio TEXT,
   avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -129,8 +131,7 @@ CREATE TABLE IF NOT EXISTS public.spaces (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_spaces_public_active ON public.spaces(is_public, created_at DESC) 
-  WHERE expires_at IS NULL OR expires_at > NOW();
+CREATE INDEX IF NOT EXISTS idx_spaces_public ON public.spaces(is_public, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_spaces_expires ON public.spaces(expires_at) WHERE expires_at IS NOT NULL;
 
 -- Space messages
@@ -477,9 +478,26 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Enable realtime for tables
-ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS public.forum_posts;
-ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS public.space_messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS public.chat_messages;
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.forum_posts;
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.space_messages;
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.chat_messages;
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Analyze tables for query planner
 ANALYZE public.profiles;

@@ -8,10 +8,11 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { booksAPI, usersAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { booksAPI } from '../services/supabase';
+import { useAuth } from '../context/AuthContext.supabase';
+import { COLORS, SPACING, TYPOGRAPHY, SHADOWS } from '../constants';
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useAuth();
@@ -26,12 +27,8 @@ const HomeScreen = ({ navigation }) => {
 
   const loadData = async () => {
     try {
-      const [booksRes, recsRes] = await Promise.all([
-        booksAPI.getAll({ limit: 5 }),
-        usersAPI.getRecommendations(),
-      ]);
-      setRecentBooks(booksRes.data.books || []);
-      setRecommendations(recsRes.data.recommendations || []);
+      const response = await booksAPI.getAll(1, 5);
+      setRecentBooks(response.books || []);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -109,7 +106,7 @@ const HomeScreen = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.actionCard}
-              onPress={() => navigation.navigate('ProfileMain', { screen: 'AIChats' })}
+              onPress={() => navigation.navigate('Profile', { screen: 'AIChats' })}
             >
               <Ionicons name="sparkles-outline" size={24} color={COLORS.info} />
               <Text style={styles.actionText}>AI Chats</Text>

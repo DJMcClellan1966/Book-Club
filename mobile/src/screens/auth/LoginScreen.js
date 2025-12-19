@@ -10,8 +10,9 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../constants';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '../../context/AuthContext.supabase';
+import { COLORS, SPACING, TYPOGRAPHY, SHADOWS } from '../../constants';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -26,11 +27,13 @@ const LoginScreen = ({ navigation }) => {
     }
 
     setLoading(true);
-    const result = await login(email, password);
-    setLoading(false);
-
-    if (!result.success) {
-      Alert.alert('Login Failed', result.message);
+    try {
+      await login(email, password);
+      setLoading(false);
+      // Navigation will be handled by AuthContext
+    } catch (error) {
+      setLoading(false);
+      Alert.alert('Login Failed', error.message || 'Invalid email or password');
     }
   };
 
@@ -40,10 +43,15 @@ const LoginScreen = ({ navigation }) => {
       style={styles.container}
     >
       <View style={styles.content}>
-        <View style={styles.header}>
+        <LinearGradient
+          colors={COLORS.gradient.primary}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
           <Text style={styles.title}>📚 Book Club</Text>
           <Text style={styles.subtitle}>Welcome back!</Text>
-        </View>
+        </LinearGradient>
 
         <View style={styles.form}>
           <TextInput

@@ -10,21 +10,71 @@ export const SOCKET_URL = __DEV__
   ? 'http://192.168.1.100:5000'  // Development - UPDATE THIS IP
   : 'https://your-production-api.com';
 
-// App Colors
+// App Colors - Modern Gradient Palette
 export const COLORS = {
   primary: '#6366f1',
+  primaryDark: '#4f46e5',
+  primaryLight: '#818cf8',
   secondary: '#8b5cf6',
+  secondaryDark: '#7c3aed',
+  accent: '#ec4899',
+  accentLight: '#f472b6',
   success: '#10b981',
   danger: '#ef4444',
+  error: '#ef4444',
   warning: '#f59e0b',
   info: '#3b82f6',
   dark: '#1f2937',
   light: '#f3f4f6',
   white: '#ffffff',
+  black: '#000000',
   text: '#111827',
   textSecondary: '#6b7280',
+  textLight: '#9ca3af',
   border: '#e5e7eb',
+  borderLight: '#f3f4f6',
   background: '#f9fafb',
+  backgroundDark: '#f3f4f6',
+  card: '#ffffff',
+  overlay: 'rgba(0, 0, 0, 0.5)',
+  gradient: {
+    primary: ['#6366f1', '#8b5cf6'],
+    secondary: ['#ec4899', '#f59e0b'],
+    success: ['#10b981', '#34d399'],
+    dark: ['#1f2937', '#374151'],
+  },
+};
+
+// Shadow Styles
+export const SHADOWS = {
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  xl: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 12,
+  },
 };
 
 // Spacing
