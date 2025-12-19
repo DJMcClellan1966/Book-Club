@@ -153,6 +153,10 @@ const BookReadersScreen = ({ route, navigation }) => {
           renderItem={renderReader}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={8}
+          initialNumToRender={10}
+          windowSize={8}
         />
       )}
     </View>

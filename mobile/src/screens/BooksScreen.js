@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -50,7 +50,7 @@ const BooksScreen = ({ navigation }) => {
     }
   };
 
-  const renderBook = ({ item }) => (
+  const renderBook = useCallback(({ item }) => (
     <TouchableOpacity
       style={styles.bookCard}
       onPress={() => navigation.navigate('BookDetail', { bookId: item.id })}
@@ -69,7 +69,7 @@ const BooksScreen = ({ navigation }) => {
       </View>
       <Ionicons name="chevron-forward" size={24} color={COLORS.textSecondary} />
     </TouchableOpacity>
-  );
+  ), [navigation]);
 
   return (
     <View style={styles.container}>
