@@ -519,9 +519,10 @@ Rules:
         return 'No discussion to summarize yet.';
       }
 
-      const discussionText = posts.map((post, idx) => 
-        `Post ${idx + 1}: ${post.content}`
-      ).join('\n\n');
+      const discussionText = posts
+        .filter(post => post && post.content)
+        .map((post, idx) => `Post ${idx + 1}: ${post.content}`)
+        .join('\n\n');
 
       const response = await axios.post(
         this.apiUrl,

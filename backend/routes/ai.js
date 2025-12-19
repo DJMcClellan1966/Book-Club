@@ -18,10 +18,11 @@ const aiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
+    const retryAfterSeconds = Math.round((req.rateLimit.resetTime - Date.now()) / 1000);
     res.status(429).json({
       error: 'Rate limit exceeded',
       message: 'Too many AI requests. Please wait before trying again.',
-      retryAfter: req.rateLimit.resetTime
+      retryAfter: retryAfterSeconds
     });
   }
 });
@@ -91,7 +92,9 @@ router.get('/book-sentiment/:bookId', async (req, res) => {
 
     // Analyze sentiment for each review (limit to avoid rate limits and timeouts)
     // Use Promise.allSettled to handle partial failures gracefully
-    const reviewsToAnalyze = reviews.slice(0, MAX_REVIEWS_TO_ANALYZE);
+    const reviewsToAnalyze = reviews
+      .filter(review => review && review.content)
+      .slice(0, MAX_REVIEWS_TO_ANALYZE);
     const sentimentResults = await Promise.allSettled(
       reviewsToAnalyze.map(review => aiService.analyzeSentiment(review.content))
     );
