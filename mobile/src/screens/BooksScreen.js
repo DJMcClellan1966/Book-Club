@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,23 +7,42 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { booksAPI } from '../services/supabase';
 import { COLORS, SPACING, TYPOGRAPHY, SHADOWS } from '../constants';
 
+// Book Genres
+const GENRES = [
+  { id: 'all', name: 'All Books', icon: '📚' },
+  { id: 'fiction', name: 'Fiction', icon: '📖' },
+  { id: 'non-fiction', name: 'Non-Fiction', icon: '📰' },
+  { id: 'mystery', name: 'Mystery', icon: '🔍' },
+  { id: 'romance', name: 'Romance', icon: '💕' },
+  { id: 'sci-fi', name: 'Sci-Fi', icon: '🚀' },
+  { id: 'fantasy', name: 'Fantasy', icon: '🧙‍♂️' },
+  { id: 'thriller', name: 'Thriller', icon: '🎭' },
+  { id: 'horror', name: 'Horror', icon: '👻' },
+  { id: 'biography', name: 'Biography', icon: '👤' },
+  { id: 'history', name: 'History', icon: '🏛️' },
+  { id: 'self-help', name: 'Self-Help', icon: '💪' },
+];
+
 const BooksScreen = ({ navigation }) => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('all');
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     loadBooks();
-  }, []);
+  }, [selectedGenre]);
 
   const loadBooks = async () => {
     try {
+      setLoading(true);
       const response = await booksAPI.getAll(page, 20);
       setBooks(response.books || []);
     } catch (error) {
@@ -50,6 +69,29 @@ const BooksScreen = ({ navigation }) => {
     }
   };
 
+  const filteredBooks = useMemo(() => {
+    if (selectedGenre === 'all' || !books.length) return books;
+    return books.filter(book => book.genre?.toLowerCase() === selectedGenre);
+  }, [books, selectedGenre]);
+
+  const renderGenreChip = useCallback(({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.genreChip,
+        selectedGenre === item.id && styles.genreChipActive
+      ]}
+      onPress={() => setSelectedGenre(item.id)}
+    >
+      <Text style={styles.genreEmoji}>{item.icon}</Text>
+      <Text style={[
+        styles.genreText,
+        selectedGenre === item.id && styles.genreTextActive
+      ]}>
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  ), [selectedGenre]);
+
   const renderBook = useCallback(({ item }) => (
     <TouchableOpacity
       style={styles.bookCard}
@@ -61,23 +103,30 @@ const BooksScreen = ({ navigation }) => {
       <View style={styles.bookInfo}>
         <Text style={styles.bookTitle} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.bookAuthor}>{item.author}</Text>
+        {item.genre && (
+          <Text style={styles.bookGenre}>{item.genre}</Text>
+        )}
         <View style={styles.bookStats}>
           <Ionicons name="star" size={14} color={COLORS.warning} />
-          <Text style={styles.bookRating}>{item.averageRating?.toFixed(1) || 'N/A'}</Text>
-          <Text style={styles.bookReviews}>({item.reviewCount || 0} reviews)</Text>
+          <Text style={styles.bookRating}>{item.average_rating?.toFixed(1) || 'N/A'}</Text>
+          <Text style={styles.bookReviews}>• {item.review_count || 0} reviews</Text>
         </View>
       </View>
-      <Ionicons name="chevron-forward" size={24} color={COLORS.textSecondary} />
+      <View style={styles.bookActions}>
+        <Ionicons name="chevron-forward" size={24} color={COLORS.textSecondary} />
+      </View>
     </TouchableOpacity>
   ), [navigation]);
 
   return (
     <View style={styles.container}>
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color={COLORS.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search books..."
+          placeholder="Search books by title or author..."
+          placeholderTextColor={COLORS.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
           onSubmitEditing={handleSearch}
@@ -88,6 +137,19 @@ const BooksScreen = ({ navigation }) => {
             <Ionicons name="close-circle" size={20} color={COLORS.textSecondary} />
           </TouchableOpacity>
         )}
+      </View>
+
+      {/* Genre Filter */}
+      <View style={styles.genresSection}>
+        <Text style={styles.sectionTitle}>Browse by Genre</Text>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={GENRES}
+          renderItem={renderGenreChip}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.genresList}
+        />
       </View>
 
       {loading ? (
