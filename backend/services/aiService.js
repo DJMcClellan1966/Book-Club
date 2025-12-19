@@ -67,159 +67,24 @@ class AIService {
   }
 
   /**
-   * Generate book recommendations based on user's reading history
-   * @param {Array} books - Array of books the user has read/is reading
-   * @returns {Promise<Array>} - Array of book recommendations with titles and reasons
-   */
-  async generateBookRecommendations(books) {
-    try {
-      if (!this.apiKey) {
-        console.warn('OpenAI API key not configured, returning default recommendations');
-        return this.getDefaultRecommendations();
-      }
-
-      if (!books || books.length === 0) {
-        return this.getDefaultRecommendations();
-      }
-
-      const bookList = books.map(book => 
-        `"${book.title}" by ${book.authors?.join(', ') || 'Unknown'}`
-      ).join(', ');
-
-      const response = await axios.post(
-        this.apiUrl,
-        {
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: `You are an expert book recommendation assistant for a book club. Based on the user's reading history, suggest 5 books they might enjoy. Consider genre, themes, writing style, and author similarities. 
-              
-              Respond with a JSON array of objects with this format:
-              [{"title": "Book Title", "author": "Author Name", "reason": "Brief explanation why they'd like it"}]`
-            },
-            {
-              role: 'user',
-              content: `Based on these books I've read or am reading: ${bookList}, suggest 5 books I might enjoy.`
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 800
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      const result = response.data.choices[0].message.content;
-      const recommendations = JSON.parse(result);
-      
-      return Array.isArray(recommendations) ? recommendations : this.getDefaultRecommendations();
-    } catch (error) {
-      console.error('AI recommendation error:', error.message);
-      return this.getDefaultRecommendations();
-    }
-  }
-
-  /**
-   * Analyze user preferences and generate reading insights
-   * @param {Object} readingData - User's reading statistics and history
-   * @returns {Promise<string>} - Personalized reading insights
-   */
-  async generateReadingInsights(readingData) {
-    try {
-      if (!this.apiKey) {
-        return 'Continue exploring diverse books to get personalized insights!';
-      }
-
-      const response = await axios.post(
-        this.apiUrl,
-        {
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a reading coach. Provide brief, encouraging insights about the user\'s reading habits and preferences. Keep it under 100 words.'
-            },
-            {
-              role: 'user',
-              content: `Provide reading insights for: ${JSON.stringify(readingData)}`
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 150
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      return response.data.choices[0].message.content.trim();
-    } catch (error) {
-      console.error('AI insights error:', error.message);
-      return 'Keep up the great reading! Explore new genres to expand your horizons.';
-    }
-  }
-
-  /**
-   * Default recommendations when AI is not available
-   * @returns {Array}
-   */
-  getDefaultRecommendations() {
-    return [
-      {
-        title: "The Midnight Library",
-        author: "Matt Haig",
-        reason: "A thought-provoking exploration of life's possibilities"
-      },
-      {
-        title: "Project Hail Mary",
-        author: "Andy Weir",
-        reason: "Perfect for fans of science fiction and adventure"
-      },
-      {
-        title: "The Seven Husbands of Evelyn Hugo",
-        author: "Taylor Jenkins Reid",
-        reason: "Engaging character-driven story with emotional depth"
-      },
-      {
-        title: "Atomic Habits",
-        author: "James Clear",
-        reason: "Practical insights for personal growth and development"
-      },
-      {
-        title: "The Song of Achilles",
-        author: "Madeline Miller",
-        reason: "Beautiful retelling of classic mythology"
-      }
-    ];
-  }
-
-  /**
    * Create a character/author personality profile
    * @param {string} name - Name of author or character
    * @param {string} type - 'author' or 'character'
-   * @param {string} bookTitle - Optional book title for context
+   * @param {string} context - Optional context for the character
    * @returns {Promise<{personality: string, greeting: string}>}
    */
-  async createCharacterPersonality(name, type, bookTitle = '') {
+  async createCharacterPersonality(name, type, context = '') {
     try {
       if (!this.apiKey) {
         return {
-          personality: `I am ${name}, and I'm here to discuss books with you.`,
-          greeting: `Hello! I'm ${name}. Let's talk about literature!`
+          personality: `I am ${name}, and I'm here to discuss with you.`,
+          greeting: `Hello! I'm ${name}. Let's talk!`
         };
       }
 
       const contextPrompt = type === 'author' 
         ? `Create a personality profile for author ${name}. Include their writing style, themes, and known personality traits.`
-        : `Create a personality profile for the character ${name}${bookTitle ? ` from "${bookTitle}"` : ''}. Include their personality, background, and how they would speak.`;
+        : `Create a personality profile for the character ${name}${context ? ` ${context}` : ''}. Include their personality, background, and how they would speak.`;
 
       const response = await axios.post(
         this.apiUrl,
@@ -253,8 +118,8 @@ class AIService {
     } catch (error) {
       console.error('Error creating personality:', error.response?.data || error.message);
       return {
-        personality: `I am ${name}, ${type === 'author' ? 'an author' : 'a character'} ready to discuss literature with you.`,
-        greeting: `Hello! I'm ${name}. Ask me anything about books and stories!`
+        personality: `I am ${name}, ${type === 'author' ? 'an author' : 'a character'} ready to discuss with you.`,
+        greeting: `Hello! I'm ${name}. Ask me anything!`
       };
     }
   }
@@ -324,16 +189,16 @@ Rules:
    * Generate a search query for finding character/author images
    * @param {string} name - Character or author name
    * @param {string} type - 'author' or 'character'
-   * @param {string} bookTitle - Optional book title
+   * @param {string} context - Optional context
    * @returns {string}
    */
-  generateImageSearchQuery(name, type, bookTitle = '') {
+  generateImageSearchQuery(name, type, context = '') {
     if (type === 'author') {
       return `${name} author portrait professional`;
     } else {
-      return bookTitle 
-        ? `${name} character ${bookTitle} book illustration`
-        : `${name} book character illustration`;
+      return context 
+        ? `${name} character ${context} illustration`
+        : `${name} character illustration`;
     }
   }
 

@@ -59,7 +59,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>My Dashboard</h1>
+        <h1>Welcome back, {user?.username || user?.email?.split('@')[0] || 'User'}!</h1>
         <button onClick={() => navigate(`/profile/${user.id}`)} className="btn btn-secondary">
           View Profile
         </button>

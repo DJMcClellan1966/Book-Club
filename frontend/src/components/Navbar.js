@@ -15,7 +15,6 @@ const Navbar = () => {
         
         <ul className="navbar-menu">
           <li><Link to="/">Home</Link></li>
-          <li><Link to="/books">Books</Link></li>
           <li><Link to="/forums">Forums</Link></li>
           <li><Link to="/spaces">Spaces</Link></li>
           

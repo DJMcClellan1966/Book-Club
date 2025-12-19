@@ -17,7 +17,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Auth API
 export const authAPI = {
-  async register(email, password, username, phoneNumber) {
+  async register(email, password, username, displayName = '') {
     // Check if username is taken
     const { data: existingProfile } = await supabase
       .from('profiles')
@@ -29,40 +29,42 @@ export const authAPI = {
       throw new Error('Username already taken');
     }
 
-    // Sign up user with email verification
+    // Sign up user with Supabase with email confirmation enabled
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { username, phone_number: phoneNumber },
-        emailRedirectTo: 'bookclub://verify-email'
+        data: { username, display_name: displayName || username },
+        emailRedirectTo: 'http://localhost:3000/verify-email'
       }
     });
 
     if (error) throw error;
 
-    // Only create profile and subscription if email is confirmed
-    // (This will be created by a database trigger or on first login after verification)
-    // For now, we'll create them but mark as pending verification
-    if (data.user && !data.user.email_confirmed_at) {
-      // User needs to verify email before accessing the app
-      return data;
+    // Only create profile and subscription if user needs email confirmation
+    // If email confirmation is required, these will be created after verification
+    // For now, create them immediately but user won't be able to login until verified
+    if (data.user) {
+      // Create profile
+      await supabase.from('profiles').insert({
+        id: data.user.id,
+        username,
+        email,
+        display_name: displayName || username,
+        email_verified: false
+      });
+
+      // Create free subscription
+      await supabase.from('subscriptions').insert({
+        user_id: data.user.id,
+        tier: 'free',
+        status: 'active'
+      });
+
+      // Save username for later (don't save password for security)
+      await AsyncStorage.setItem('pending_verification_username', username);
+      await AsyncStorage.setItem('pending_verification_email', email);
     }
-
-    // Create profile
-    await supabase.from('profiles').insert({
-      id: data.user.id,
-      username,
-      email,
-      phone_number: phoneNumber
-    });
-
-    // Create free subscription
-    await supabase.from('subscriptions').insert({
-      user_id: data.user.id,
-      tier: 'free',
-      status: 'active'
-    });
 
     return data;
   },
@@ -99,18 +101,67 @@ export const authAPI = {
     return data;
   },
 
-  async login(email, password) {
+  async resendVerificationEmail(email) {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email
+    });
+
+    if (error) throw error;
+    return { message: 'Verification email sent! Please check your inbox.' };
+  },
+
+  async login(emailOrUsername, password) {
+    let email = emailOrUsername;
+    
+    // Check if input is a username (doesn't contain @)
+    if (!emailOrUsername.includes('@')) {
+      // Look up email by username
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', emailOrUsername)
+        .single();
+      
+      if (!profile) {
+        throw new Error('Invalid credentials');
+      }
+      
+      email = profile.email;
+    }
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
-    if (error) throw error;
+    if (error) {
+      // Check if it's an email verification error
+      if (error.message.includes('Email not confirmed')) {
+        const verificationError = new Error('Please verify your email before logging in. Check your inbox for the verification link.');
+        verificationError.needsVerification = true;
+        verificationError.email = email;
+        throw verificationError;
+      }
+      
+      // For invalid credentials, provide helpful message
+      if (error.message.includes('Invalid login credentials')) {
+        const helpfulError = new Error('Invalid email or password. If you just registered, please verify your email first.');
+        helpfulError.needsVerification = false;
+        helpfulError.email = email;
+        throw helpfulError;
+      }
+      
+      throw error;
+    }
 
     // Check if email is verified
     if (!data.user.email_confirmed_at) {
       await supabase.auth.signOut();
-      throw new Error('Please verify your email before logging in. Check your inbox for the verification link.');
+      const verificationError = new Error('Please verify your email before logging in. Check your inbox for the verification link.');
+      verificationError.needsVerification = true;
+      verificationError.email = email;
+      throw verificationError;
     }
 
     // Get profile and subscription
@@ -190,74 +241,15 @@ export const authAPI = {
   }
 };
 
-// Books API
-export const booksAPI = {
-  async getAll(page = 1, limit = 20) {
-    const { data, error, count } = await supabase
-      .from('books')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range((page - 1) * limit, page * limit - 1);
-
-    if (error) throw error;
-    return { books: data, total: count };
-  },
-
-  async getById(id) {
-    const { data, error } = await supabase
-      .from('books')
-      .select(`
-        *,
-        reviews (
-          id,
-          title,
-          content,
-          rating,
-          likes,
-          created_at,
-          profiles (username, avatar_url)
-        )
-      `)
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async search(query) {
-    const { data, error } = await supabase
-      .from('books')
-      .select('*')
-      .or(`title.ilike.%${query}%,author.ilike.%${query}%`)
-      .limit(20);
-
-    if (error) throw error;
-    return data;
-  },
-
-  async create(bookData) {
-    const { data, error } = await supabase
-      .from('books')
-      .insert(bookData)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-};
-
 // Reviews API
 export const reviewsAPI = {
-  async create(bookId, reviewData) {
+  async create(reviewData) {
     const { data: { user } } = await supabase.auth.getUser();
     
     const { data, error } = await supabase
       .from('reviews')
       .insert({
         ...reviewData,
-        book_id: bookId,
         user_id: user.id
       })
       .select()
@@ -289,174 +281,12 @@ export const reviewsAPI = {
   }
 };
 
-// Reader Connection API
-export const readerConnectionAPI = {
-  async getBookReaders(bookId) {
-    // Get users who reviewed or added this book to reading list
-    const { data: reviewers, error: reviewError } = await supabase
-      .from('reviews')
-      .select('user_id, profiles(id, username, avatar_url, bio)')
-      .eq('book_id', bookId);
-
-    const { data: readers, error: readError } = await supabase
-      .from('reading_lists')
-      .select('user_id, status, profiles(id, username, avatar_url, bio)')
-      .eq('book_id', bookId);
-
-    if (reviewError || readError) throw reviewError || readError;
-
-    // Combine and deduplicate
-    const allReaders = new Map();
-    
-    reviewers?.forEach(r => {
-      if (r.profiles) {
-        allReaders.set(r.user_id, { ...r.profiles, hasReviewed: true, status: 'reviewed' });
-      }
-    });
-
-    readers?.forEach(r => {
-      if (r.profiles) {
-        const existing = allReaders.get(r.user_id);
-        allReaders.set(r.user_id, { 
-          ...r.profiles, 
-          hasReviewed: existing?.hasReviewed || false,
-          status: r.status 
-        });
-      }
-    });
-
-    return Array.from(allReaders.values());
-  },
-
-  async startDirectMessage(recipientId) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    // Check if chat already exists
-    const { data: existing } = await supabase
-      .from('spaces')
-      .select('id')
-      .eq('type', 'direct')
-      .contains('member_ids', [user.id, recipientId])
-      .single();
-
-    if (existing) return existing;
-
-    // Create new direct message space
-    const { data, error } = await supabase
-      .from('spaces')
-      .insert({
-        name: 'Direct Message',
-        type: 'direct',
-        member_ids: [user.id, recipientId],
-        created_by: user.id
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async createBookForum(bookId, title, description) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-      .from('forums')
-      .insert({
-        title,
-        description,
-        book_id: bookId,
-        created_by: user.id
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async getBookForums(bookId) {
-    const { data, error } = await supabase
-      .from('forums')
-      .select(`
-        *,
-        profiles(username, avatar_url),
-        forum_posts(count)
-      `)
-      .eq('book_id', bookId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
-  }
-};
-
-// Reading List API
-export const readingListAPI = {
-  async getMyList() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-      .from('reading_lists')
-      .select('*, books(*)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
-  },
-
-  async add(bookId, status = 'want-to-read') {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-      .from('reading_lists')
-      .insert({
-        user_id: user.id,
-        book_id: bookId,
-        status
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async updateStatus(bookId, status) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-      .from('reading_lists')
-      .update({ status })
-      .eq('user_id', user.id)
-      .eq('book_id', bookId)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async remove(bookId) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { error } = await supabase
-      .from('reading_lists')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('book_id', bookId);
-
-    if (error) throw error;
-  }
-};
-
 // Forums API
 export const forumsAPI = {
   async getAll(page = 1, limit = 20) {
     const { data, error } = await supabase
       .from('forums')
-      .select('*, books(title, cover_url), profiles(username)')
+      .select('*, profiles(username)')
       .order('created_at', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
@@ -469,7 +299,6 @@ export const forumsAPI = {
       .from('forums')
       .select(`
         *,
-        books(title, cover_url),
         forum_posts(
           *,
           profiles(username, avatar_url)
@@ -538,7 +367,7 @@ export const spacesAPI = {
   async getAll() {
     const { data, error } = await supabase
       .from('spaces')
-      .select('*, books(title), profiles(username)')
+      .select('*, profiles(username)')
       .eq('is_public', true)
       .order('created_at', { ascending: false });
 
@@ -551,7 +380,6 @@ export const spacesAPI = {
       .from('spaces')
       .select(`
         *,
-        books(title, cover_url),
         space_messages(
           *,
           profiles(username, avatar_url)
@@ -734,9 +562,7 @@ export const subscriptionAPI = {
 export default {
   supabase,
   authAPI,
-  booksAPI,
   reviewsAPI,
-  readingListAPI,
   forumsAPI,
   spacesAPI,
   aiChatsAPI,

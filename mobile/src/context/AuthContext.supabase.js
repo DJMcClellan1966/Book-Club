@@ -64,10 +64,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, username, phoneNumber) => {
+  const register = async (email, password, username, displayName = '') => {
     setLoading(true);
     try {
-      const data = await authAPI.register(email, password, username, phoneNumber);
+      const data = await authAPI.register(email, password, username, displayName);
       setSession(data.session);
       
       // Load full user profile

@@ -57,21 +57,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (username, email, password, phone = '', countryCode = '+1') => {
     try {
       const response = await axios.post('/api/auth/register', { 
         username, 
-        email, 
-        password 
+        email: email || undefined, 
+        password,
+        phone: phone || undefined,
+        countryCode
       });
-      const { token: newToken, user: userData } = response.data;
+      const { token: newToken, user: userData, needsPhoneVerification } = response.data;
       
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       
-      return { success: true };
+      return { success: true, needsPhoneVerification };
     } catch (error) {
       return { 
         success: false, 

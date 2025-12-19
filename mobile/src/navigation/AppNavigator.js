@@ -12,8 +12,6 @@ import RegisterScreen from '../screens/auth/RegisterScreen';
 
 // Main Screens
 import HomeScreen from '../screens/HomeScreen';
-import BooksScreen from '../screens/BooksScreen';
-import BookDetailScreen from '../screens/BookDetailScreen';
 import ForumsScreen from '../screens/ForumsScreen';
 import ForumDetailScreen from '../screens/ForumDetailScreen';
 import SpacesScreen from '../screens/SpacesScreen';
@@ -22,7 +20,6 @@ import AIChatsScreen from '../screens/AIChatsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import PricingScreen from '../screens/PricingScreen';
 import TwoFactorSetupScreen from '../screens/TwoFactorSetupScreen';
-import BookReadersScreen from '../screens/BookReadersScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,43 +63,12 @@ const HomeStack = () => (
     <Stack.Screen 
       name="HomeMain" 
       component={HomeScreen}
-      options={{ title: 'Book Club' }}
-    />
-    <Stack.Screen 
-      name="BookDetail" 
-      component={BookDetailScreen}
-      options={{ title: 'Book Details' }}
+      options={{ title: 'Community Hub' }}
     />
   </Stack.Navigator>
 );
 
-// Books Stack
-const BooksStack = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: {
-        backgroundColor: COLORS.primary,
-      },
-      headerTintColor: COLORS.white,
-    }}
-  >
-    <Stack.Screen 
-      name="BooksList" 
-      component={BooksScreen}
-      options={{ title: 'Browse Books' }}
-    />
-    <Stack.Screen 
-      name="BookDetail" 
-      component={BookDetailScreen}
-      options={{ title: 'Book Details' }}
-    />
-    <Stack.Screen 
-      name="BookReaders" 
-      component={BookReadersScreen}
-      options={{ title: 'Connect with Readers' }}
-    />
-  </Stack.Navigator>
-);
+
 
 // Forums Stack
 const ForumsStack = () => (
@@ -192,8 +158,6 @@ const MainTabs = () => (
 
         if (route.name === 'Home') {
           iconName = focused ? 'home' : 'home-outline';
-        } else if (route.name === 'Books') {
-          iconName = focused ? 'book' : 'book-outline';
         } else if (route.name === 'Forums') {
           iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
         } else if (route.name === 'Spaces') {
@@ -210,7 +174,6 @@ const MainTabs = () => (
     })}
   >
     <Tab.Screen name="Home" component={HomeStack} />
-    <Tab.Screen name="Books" component={BooksStack} />
     <Tab.Screen name="Forums" component={ForumsStack} />
     <Tab.Screen name="Spaces" component={SpacesStack} />
     <Tab.Screen name="Profile" component={ProfileStack} />

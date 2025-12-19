@@ -9,7 +9,7 @@ const Home = () => {
   return (
     <div className="home-container">
       <section className="hero">
-        <h1>Welcome to Book Club</h1>
+        <h1>Welcome to Community Hub{user ? `, ${user.username || user.email?.split('@')[0]}!` : ''}</h1>
         <p className="hero-subtitle">
           Connect with fellow readers, share reviews, discuss books, and join video chats
         </p>

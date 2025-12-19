@@ -16,25 +16,25 @@ const HomeScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.welcome}>
-        <Text style={styles.welcomeText}>Welcome back,</Text>
-        <Text style={styles.welcomeName}>{user?.username}! 👋</Text>
+        <Text style={styles.welcomeText}>Welcome to Community Hub,</Text>
+        <Text style={styles.welcomeName}>{user?.username || user?.email?.split('@')[0] || 'User'}! 👋</Text>
       </View>
 
       <View style={styles.quickActions}>
         <TouchableOpacity
           style={styles.actionCard}
-          onPress={() => navigation.navigate('Books')}
+          onPress={() => navigation.navigate('Forums')}
         >
-          <Ionicons name="book-outline" size={32} color={COLORS.primary} />
-          <Text style={styles.actionText}>Browse Books</Text>
+          <Ionicons name="chatbubbles-outline" size={32} color={COLORS.primary} />
+          <Text style={styles.actionText}>Forums</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.actionCard}
-          onPress={() => navigation.navigate('Forums')}
+          onPress={() => navigation.navigate('Spaces')}
         >
-          <Ionicons name="chatbubbles-outline" size={32} color={COLORS.secondary} />
-          <Text style={styles.actionText}>Forums</Text>
+          <Ionicons name="people-outline" size={32} color={COLORS.secondary} />
+          <Text style={styles.actionText}>Spaces</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -47,15 +47,15 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.exploreSection}>
-        <Text style={styles.sectionTitle}>📚 Start Exploring</Text>
+        <Text style={styles.sectionTitle}>� Start Exploring</Text>
         <Text style={styles.sectionSubtitle}>
-          Browse thousands of books, connect with readers, and chat with AI literary characters
+          Join discussion spaces, connect with community members, and chat with AI characters
         </Text>
         <TouchableOpacity
           style={styles.exploreButton}
-          onPress={() => navigation.navigate('Books')}
+          onPress={() => navigation.navigate('Spaces')}
         >
-          <Text style={styles.exploreButtonText}>Explore Library</Text>
+          <Text style={styles.exploreButtonText}>Explore Spaces</Text>
           <Ionicons name="arrow-forward" size={20} color={COLORS.white} />
         </TouchableOpacity>
       </View>

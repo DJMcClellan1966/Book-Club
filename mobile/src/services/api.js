@@ -45,16 +45,8 @@ export const authAPI = {
   getCurrentUser: () => api.get('/auth/me'),
 };
 
-// Books API
-export const booksAPI = {
-  getAll: (params) => api.get('/books', { params }),
-  getById: (id) => api.get(`/books/${id}`),
-  search: (query) => api.get('/books/search', { params: { q: query } }),
-};
-
 // Reviews API
 export const reviewsAPI = {
-  getByBook: (bookId) => api.get(`/reviews/book/${bookId}`),
   create: (reviewData) => api.post('/reviews', reviewData),
   update: (id, reviewData) => api.put(`/reviews/${id}`, reviewData),
   delete: (id) => api.delete(`/reviews/${id}`),
@@ -90,9 +82,6 @@ export const aiChatsAPI = {
 export const usersAPI = {
   getProfile: () => api.get('/users/profile'),
   updateProfile: (profileData) => api.put('/users/profile', profileData),
-  getReadingList: () => api.get('/users/reading-list'),
-  updateReadingList: (bookId, status) => api.put('/users/reading-list', { bookId, status }),
-  getRecommendations: () => api.get('/users/recommendations'),
 };
 
 // Payments API

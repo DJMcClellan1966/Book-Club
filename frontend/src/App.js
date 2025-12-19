@@ -7,9 +7,8 @@ import './App.css';
 // Import pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import VerifyEmail from './pages/VerifyEmail';
 import Home from './pages/Home';
-import Books from './pages/Books';
-import BookDetail from './pages/BookDetail';
 import Forums from './pages/Forums';
 import ForumDetail from './pages/ForumDetail';
 import Spaces from './pages/Spaces';
@@ -41,9 +40,8 @@ function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/" element={<Home />} />
-                <Route path="/books" element={<Books />} />
-                <Route path="/books/:id" element={<BookDetail />} />
                 <Route path="/forums" element={<Forums />} />
                 <Route path="/forums/:id" element={<ForumDetail />} />
                 <Route path="/spaces" element={<Spaces />} />

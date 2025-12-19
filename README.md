@@ -1,23 +1,17 @@
-# Book Club Application
+# Community Hub Application
 
-A comprehensive full-stack application for book lovers to connect, share reviews, participate in discussions, and engage in video chats about books. Available on **Web**, **iOS**, and **Android**.
+A comprehensive full-stack application for people to connect, share reviews, participate in discussions, and engage in video chats. Available on **Web**, **iOS**, and **Android**.
 
 ## 🌟 Features
-
-### 📚 Book Management
-- **Search Books**: Integration with Google Books API to search and discover millions of books
-- **Reading Lists**: Track books you're currently reading, want to read, or have already read
-- **Book Details**: View comprehensive information about books including covers, descriptions, and metadata
 
 ### ✍️ Reviews & Ratings
 - **Write Reviews**: Share detailed reviews with ratings (1-5 stars)
 - **Read Reviews**: Browse reviews from other community members
 - **Like & Comment**: Engage with reviews through likes and comments
-- **Average Ratings**: See community ratings for each book
 
 ### 💬 Discussion Forums
-- **Create Forums**: Start topic-specific or book-specific discussion forums
-- **Forum Categories**: Organize discussions by general, book-discussion, recommendations, author-talk
+- **Create Forums**: Start topic-specific discussion forums
+- **Forum Categories**: Organize discussions by topics of interest
 - **Post & Reply**: Share thoughts and reply to other members' posts
 - **Like Posts**: Show appreciation for valuable contributions
 
@@ -30,17 +24,23 @@ A comprehensive full-stack application for book lovers to connect, share reviews
 
 ### 👤 User Profiles
 - **Personal Profile**: Customize your profile with bio and avatar
-- **Follow System**: Follow other readers and build your network
-- **Activity Tracking**: View reading history and review contributions
-- **Dashboard**: Centralized view of your reading lists and activities
+- **Follow System**: Follow other members and build your network
+- **Activity Tracking**: View your activity and review contributions
+- **Dashboard**: Centralized view of your activities
+
+### 🔐 Authentication & Security
+- **Multiple Login Methods**: Login with email, username, or phone number
+- **Phone Authentication**: SMS verification for phone-based accounts
+- **Country Code Auto-Detection**: Automatic country code selection based on location
+- **Password Strength Requirements**: Enforced strong password policies
+- **Account Recovery**: Forgot password and username recovery options
+- **2FA Support**: Two-factor authentication for enhanced security
 
 ### 🤖 AI-Powered Features
 - **Content Moderation**: Automatic AI moderation of forum posts and space messages to maintain community standards
-- **Smart Book Recommendations**: Personalized book suggestions based on your reading history using AI
-- **Reading Insights**: AI-generated insights about your reading habits and preferences
 - **Severity Detection**: Multi-level moderation with warnings for borderline content and blocks for severe violations
-- **AI Character & Author Chats**: Have conversations with your favorite authors and book characters
-- **Personality Simulation**: AI creates authentic character/author personalities for engaging discussions
+- **AI Character & Author Chats**: Have conversations with AI-powered characters
+- **Personality Simulation**: AI creates authentic personalities for engaging discussions
 - **Video Avatars**: Animated video responses for Premium/Pro subscribers (coming soon)
 
 ### 💰 Monetization Features
@@ -49,8 +49,7 @@ A comprehensive full-stack application for book lovers to connect, share reviews
   - Premium: 10 AI chats, 100 messages/day, video avatars
   - Pro: Unlimited AI chats and messages, video avatars
 - **Stripe Integration**: Secure payment processing with 7-day free trials
-- **Feature Gates**: Premium features like ad-free experience, enhanced AI, unlimited lists
-- **Affiliate Links**: Earn commissions through Amazon, Bookshop.org, and Barnes & Noble
+- **Feature Gates**: Premium features like ad-free experience, enhanced AI
 - **Billing Portal**: Self-service subscription management for users
 - **Webhook Automation**: Automated subscription lifecycle handling
 
@@ -62,8 +61,7 @@ A comprehensive full-stack application for book lovers to connect, share reviews
 - **Socket.io**: Real-time WebSocket communication
 - **JWT**: Secure authentication
 - **bcryptjs**: Password hashing
-- **Google Books API**: Book data integration
-- **OpenAI API**: AI-powered content moderation and recommendations
+- **OpenAI API**: AI-powered content moderation and chat features
 - **Stripe**: Payment processing and subscription management
 
 ### Frontend
@@ -187,19 +185,9 @@ npm start
 2. **Login**: Sign in with your credentials
 3. **Explore**: Browse books, forums, and spaces
 
-### Managing Books
-
-1. Navigate to **Books** page
-2. Search for books using the search bar
-3. Click on a book to view details
-4. Add books to your reading lists:
-   - Currently Reading
-   - Want to Read
-   - Already Read
-
 ### Writing Reviews
 
-1. Go to a book's detail page
+1. Navigate to the reviews section
 2. Click **Write a Review**
 3. Select a rating (1-5 stars)
 4. Write your review title and content
@@ -233,16 +221,6 @@ npm start
    - Cancel or reactivate subscription
    - View payment history
 
-### Purchasing Books (Affiliate Links)
-
-1. View any book detail page
-2. Scroll to "Buy this book" section
-3. Click preferred retailer button:
-   - Amazon
-   - Bookshop.org
-   - Barnes & Noble
-4. Complete purchase on retailer site
-
 ### Video Chat
 
 1. Join a space with video enabled
@@ -250,13 +228,13 @@ npm start
 3. Allow browser permissions for camera and microphone
 4. Use controls to toggle video/audio or leave the call
 
-### AI Character & Author Chats
+### AI Character Chats
 
 1. Navigate to **AI Chats** page
 2. Click the **+** button to create a new chat
 3. Select chat type:
-   - **Author**: Chat with famous authors about their work and writing style
-   - **Character**: Talk to book characters about their stories
+   - **Author**: Chat with famous authors
+   - **Character**: Talk to characters
 4. Enter the character/author name
 5. (Optional) Add book title for more context
 6. (Premium/Pro) Enable video avatar for animated responses
@@ -270,14 +248,7 @@ npm start
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user
 
-### Books
-- `GET /api/books` - Get all books
-- `GET /api/books/search?query=` - Search books
-- `GET /api/books/:id` - Get book details
-- `POST /api/books` - Add book to database
-
 ### Reviews
-- `GET /api/reviews/book/:bookId` - Get book reviews
 - `GET /api/reviews/user/:userId` - Get user reviews
 - `POST /api/reviews` - Create review
 - `PUT /api/reviews/:id` - Update review
@@ -301,10 +272,7 @@ npm start
 ### Users
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/profile` - Update profile
-- `POST /api/users/reading-list/:listType` - Add to reading list
 - `POST /api/users/:id/follow` - Follow user
-- `GET /api/users/recommendations` - Get AI book recommendations
-- `GET /api/users/reading-insights` - Get AI reading insights
 
 ### Payments & Subscriptions
 - `GET /api/payments/pricing` - Get subscription pricing tiers
@@ -317,13 +285,7 @@ npm start
 - `POST /api/payments/portal` - Create billing portal session
 - `POST /api/payments/webhook` - Stripe webhook handler
 
-### Affiliate Links
-- `GET /api/affiliates/book/:bookId/link/:platform` - Generate affiliate link
-- `POST /api/affiliates/track-click` - Track affiliate click
-- `GET /api/affiliates/stats` - Get affiliate statistics (admin)
-- `GET /api/affiliates/book/:bookId/platforms` - Get available platforms
-
-### AI Character & Author Chats
+### AI Character Chats
 - `GET /api/aichats/my-chats` - Get all user's AI chat sessions
 - `POST /api/aichats/create` - Create new AI character/author chat
 - `POST /api/aichats/:chatId/message` - Send message to AI character
@@ -337,24 +299,20 @@ Book-Club/
 ├── backend/             # Node.js/Express API server
 │   ├── models/          # MongoDB schemas
 │   │   ├── User.js
-│   │   ├── Book.js
 │   │   ├── Review.js
 │   │   ├── Forum.js
 │   │   ├── Space.js
 │   │   ├── Subscription.js
 │   │   ├── Payment.js
-│   │   ├── AffiliateClick.js
 │   │   ├── AIChat.js
 │   │   └── ChatMessage.js
 │   ├── routes/          # API routes
 │   │   ├── auth.js
-│   │   ├── books.js
 │   │   ├── reviews.js
 │   │   ├── forums.js
 │   │   ├── spaces.js
 │   │   ├── users.js
 │   │   ├── payments.js
-│   │   ├── affiliates.js
 │   │   └── aichats.js
 │   ├── middleware/      # Custom middleware
 │   │   ├── auth.js
@@ -371,15 +329,12 @@ Book-Club/
 │   ├── src/
 │   │   ├── components/  # Reusable components
 │   │   │   ├── Navbar.js
-│   │   │   ├── BookCard.js
 │   │   │   ├── VideoChat.js
 │   │   │   └── ChatInterface.js
 │   │   ├── pages/       # Page components
 │   │   │   ├── Home.js
 │   │   │   ├── Login.js
 │   │   │   ├── Register.js
-│   │   │   ├── Books.js
-│   │   │   ├── BookDetail.js
 │   │   │   ├── Forums.js
 │   │   │   ├── ForumDetail.js
 │   │   │   ├── Spaces.js
@@ -402,7 +357,6 @@ Book-Club/
     │   ├── screens/     # Mobile screens
     │   │   ├── auth/    # Login, Register
     │   │   ├── HomeScreen.js
-    │   │   ├── BooksScreen.js
     │   │   ├── ForumsScreen.js
     │   │   ├── SpacesScreen.js
     │   │   ├── ProfileScreen.js
@@ -444,11 +398,10 @@ The application uses Simple Peer library for WebRTC peer-to-peer video connectio
 ### Backend (.env)
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/bookclub
+MONGODB_URI=mongodb://localhost:27017/communityhub
 JWT_SECRET=your_secure_random_string_here
 CLIENT_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:3000
-GOOGLE_BOOKS_API_KEY=your_api_key_optional
 OPENAI_API_KEY=your_openai_api_key_for_ai_features
 
 # Payment Processing (Optional - for monetization)
@@ -456,17 +409,11 @@ STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 STRIPE_PREMIUM_PRICE_ID=price_premium_id_from_stripe
 STRIPE_PRO_PRICE_ID=price_pro_id_from_stripe
-
-# Affiliate Links (Optional - for book purchases)
-AMAZON_AFFILIATE_TAG=your-tag-20
-BOOKSHOP_AFFILIATE_TAG=your-tag
-BN_AFFILIATE_TAG=your-tag
 ```
 
 **Notes:**
-- **AI Features**: App works without OpenAI API key, but AI moderation and recommendations will be disabled
+- **AI Features**: App works without OpenAI API key, but AI moderation and chat features will be disabled
 - **Stripe**: Required only if you want to enable paid subscriptions
-- **Affiliate Tags**: Required only if you want to earn commissions from book purchases
 - See [MONETIZATION.md](MONETIZATION.md) for detailed payment setup instructions
 
 ### Frontend (.env)
@@ -505,12 +452,6 @@ REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
 - Use Stripe test cards for development
 - Review Stripe dashboard for payment errors
 - See [MONETIZATION.md](MONETIZATION.md) for detailed troubleshooting
-
-### Affiliate Links Not Working
-- Ensure books have ISBN information
-- Verify affiliate tags are configured
-- Check browser isn't blocking popups
-- Test links manually to verify formatting
 
 ### AI Chat Issues
 - Check OpenAI API key is valid and has credits
@@ -564,15 +505,13 @@ This project is open source and available under the MIT License.
 
 ## 📱 Mobile Applications
 
-The Book Club app is available as native iOS and Android applications built with React Native and Expo.
+The Community Hub app is available as native iOS and Android applications built with React Native and Expo.
 
 ### Features
 - ✅ Full authentication (login/register)
-- ✅ Browse and search books
-- ✅ View book details and reviews
 - ✅ Access forums and discussions
 - ✅ Join spaces and chat
-- ✅ AI character/author conversations
+- ✅ AI character conversations
 - ✅ Profile management
 - ✅ Subscription management
 - ✅ Native mobile UI/UX
@@ -612,7 +551,6 @@ See [mobile/README.md](mobile/README.md) for detailed instructions on:
 
 ## 🙏 Acknowledgments
 
-- Google Books API for book data
 - Socket.io for real-time communication
 - Simple Peer for WebRTC implementation
 - MongoDB and Mongoose for database management
@@ -627,5 +565,5 @@ For support, please open an issue in the repository or contact the development t
 
 ---
 
-**Happy Reading! 📚**
-A place where people can connect and talk about their favorite books
+**Welcome to the Community! 🎉**
+A place where people can connect and engage in meaningful discussions
