@@ -38,10 +38,17 @@ A comprehensive full-stack application for book lovers to connect, share reviews
 - **Content Moderation**: Automatic AI moderation of forum posts and space messages to maintain community standards
 - **Smart Book Recommendations**: Personalized book suggestions based on your reading history using AI
 - **Reading Insights**: AI-generated insights about your reading habits and preferences
-- **Severity Detection**: Multi-level moderation with warnings for borderline content and blocks for severe violations
+- **Sentiment Analysis**: Analyze emotional tone and opinions in book reviews with detailed aspect-based insights
+- **Topic Tagging**: Automatic categorization of books and discussions with relevant topic tags
+- **Smart Summarization**: AI-generated concise summaries for books, reviews, and discussions
+- **Discussion Summarizer**: Automatic summaries of forum threads highlighting key points and consensus
+- **Personalized Notifications**: AI-generated engaging notification content for recommendations and updates
 - **AI Character & Author Chats**: Have conversations with your favorite authors and book characters
 - **Personality Simulation**: AI creates authentic character/author personalities for engaging discussions
-- **Video Avatars**: Animated video responses for Premium/Pro subscribers (coming soon)
+- **Severity Detection**: Multi-level moderation with warnings for borderline content and blocks for severe violations
+- **Speech-to-Text** (coming soon): Submit voice reviews converted to text
+- **OCR for Books** (coming soon): Extract text from scanned book pages and images
+- **Video Avatars** (coming soon): Animated video responses for Premium/Pro subscribers
 
 ### 💰 Monetization Features
 - **Subscription Tiers**: Free, Premium ($9.99/mo), and Pro ($19.99/mo) plans
@@ -330,6 +337,20 @@ npm start
 - `DELETE /api/aichats/:chatId` - Delete AI chat session
 - `GET /api/aichats/limits/current` - Get current usage and tier limits
 
+### AI Features
+- `GET /api/ai/status` - Check AI service status and available features
+- `POST /api/ai/sentiment` - Analyze sentiment of text
+- `GET /api/ai/review-sentiment/:reviewId` - Get sentiment analysis for a review
+- `GET /api/ai/book-sentiment/:bookId` - Get aggregate sentiment for all reviews of a book
+- `POST /api/ai/generate-tags` - Generate topic tags for text
+- `GET /api/ai/book-tags/:bookId` - Generate tags for a book
+- `POST /api/ai/summarize` - Generate summary of text
+- `GET /api/ai/book-summary/:bookId` - Get AI-generated book summary
+- `GET /api/ai/discussion-summary/:forumId` - Generate summary of forum discussion
+- `POST /api/ai/transcribe` - Transcribe speech to text (placeholder)
+- `POST /api/ai/ocr` - Extract text from image (placeholder)
+- `POST /api/ai/notification` - Generate personalized notification
+
 ## 🎨 Project Structure
 
 ```
@@ -557,10 +578,11 @@ This project is open source and available under the MIT License.
 
 ## 📚 Additional Documentation
 
-- **[mobile/README.md](mobile/README.md)** - Complete guide to building and deploying mobile apps
-- **[MONETIZATION.md](MONETIZATION.md)** - Complete guide to payment processing, subscriptions, and affiliate links
+- **[AI_SETUP.md](AI_SETUP.md)** - **NEW!** Comprehensive setup guide for all AI features including sentiment analysis, topic tagging, summarization, and more
 - **[AI_FEATURES.md](AI_FEATURES.md)** - Detailed documentation on AI moderation and recommendations
 - **[AI_CHAT_GUIDE.md](AI_CHAT_GUIDE.md)** - Complete guide to AI character and author chat feature
+- **[mobile/README.md](mobile/README.md)** - Complete guide to building and deploying mobile apps
+- **[MONETIZATION.md](MONETIZATION.md)** - Complete guide to payment processing, subscriptions, and affiliate links
 
 ## 📱 Mobile Applications
 
