@@ -1,10 +1,30 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const authMiddleware = require('../middleware/auth');
 const aiService = require('../services/aiService');
 const Review = require('../models/Review');
 const Book = require('../models/Book');
 const Forum = require('../models/Forum');
+
+// Rate limiter for AI endpoints - 20 requests per 15 minutes per IP
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: 'Too many AI requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      error: 'Rate limit exceeded',
+      message: 'Too many AI requests. Please wait before trying again.',
+      retryAfter: req.rateLimit.resetTime
+    });
+  }
+});
+
+// Apply rate limiter to all routes
+router.use(aiLimiter);
 
 /**
  * @route   POST /api/ai/sentiment
@@ -66,10 +86,28 @@ router.get('/book-sentiment/:bookId', async (req, res) => {
       });
     }
 
-    // Analyze sentiment for each review
-    const sentiments = await Promise.all(
-      reviews.slice(0, 20).map(review => aiService.analyzeSentiment(review.content))
+    // Analyze sentiment for each review (limit to 10 to avoid rate limits)
+    // Use Promise.allSettled to handle partial failures gracefully
+    const reviewsToAnalyze = reviews.slice(0, 10);
+    const sentimentResults = await Promise.allSettled(
+      reviewsToAnalyze.map(review => aiService.analyzeSentiment(review.content))
     );
+
+    // Filter successful results
+    const sentiments = sentimentResults
+      .filter(result => result.status === 'fulfilled')
+      .map(result => result.value);
+
+    if (sentiments.length === 0) {
+      return res.json({
+        bookId: req.params.bookId,
+        averageSentiment: 'neutral',
+        averageScore: 0,
+        reviewCount: reviews.length,
+        analyzedCount: 0,
+        note: 'Unable to analyze sentiments at this time'
+      });
+    }
 
     // Calculate average
     const avgScore = sentiments.reduce((sum, s) => sum + s.score, 0) / sentiments.length;

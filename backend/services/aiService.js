@@ -385,12 +385,17 @@ Rules:
         }
       );
 
-      const result = JSON.parse(response.data.choices[0].message.content);
-      return {
-        sentiment: result.sentiment || 'neutral',
-        score: result.score || 0,
-        aspects: result.aspects || {}
-      };
+      try {
+        const result = JSON.parse(response.data.choices[0].message.content);
+        return {
+          sentiment: result.sentiment || 'neutral',
+          score: result.score || 0,
+          aspects: result.aspects || {}
+        };
+      } catch (parseError) {
+        console.error('Failed to parse sentiment response:', parseError.message);
+        return { sentiment: 'neutral', score: 0, aspects: {} };
+      }
     } catch (error) {
       console.error('Sentiment analysis error:', error.message);
       return { sentiment: 'neutral', score: 0, aspects: {} };
@@ -439,8 +444,13 @@ Rules:
         }
       );
 
-      const result = JSON.parse(response.data.choices[0].message.content);
-      return Array.isArray(result) ? result : ['general'];
+      try {
+        const result = JSON.parse(response.data.choices[0].message.content);
+        return Array.isArray(result) ? result : ['general'];
+      } catch (parseError) {
+        console.error('Failed to parse topic tags response:', parseError.message);
+        return ['general'];
+      }
     } catch (error) {
       console.error('Topic tagging error:', error.message);
       return ['general'];
@@ -642,11 +652,19 @@ Rules:
         }
       );
 
-      const result = JSON.parse(response.data.choices[0].message.content);
-      return {
-        title: result.title || 'Notification',
-        message: result.message || 'You have a new update!'
-      };
+      try {
+        const result = JSON.parse(response.data.choices[0].message.content);
+        return {
+          title: result.title || 'Notification',
+          message: result.message || 'You have a new update!'
+        };
+      } catch (parseError) {
+        console.error('Failed to parse notification response:', parseError.message);
+        return {
+          title: 'Update',
+          message: 'You have a new notification!'
+        };
+      }
     } catch (error) {
       console.error('Notification generation error:', error.message);
       return {
