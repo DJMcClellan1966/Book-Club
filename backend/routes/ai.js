@@ -7,6 +7,9 @@ const Review = require('../models/Review');
 const Book = require('../models/Book');
 const Forum = require('../models/Forum');
 
+// Configuration constants
+const MAX_REVIEWS_TO_ANALYZE = 10; // Limit to avoid rate limits and timeouts
+
 // Rate limiter for AI endpoints - 20 requests per 15 minutes per IP
 const aiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -86,9 +89,9 @@ router.get('/book-sentiment/:bookId', async (req, res) => {
       });
     }
 
-    // Analyze sentiment for each review (limit to 10 to avoid rate limits)
+    // Analyze sentiment for each review (limit to avoid rate limits and timeouts)
     // Use Promise.allSettled to handle partial failures gracefully
-    const reviewsToAnalyze = reviews.slice(0, 10);
+    const reviewsToAnalyze = reviews.slice(0, MAX_REVIEWS_TO_ANALYZE);
     const sentimentResults = await Promise.allSettled(
       reviewsToAnalyze.map(review => aiService.analyzeSentiment(review.content))
     );

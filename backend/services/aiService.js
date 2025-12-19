@@ -4,6 +4,8 @@ class AIService {
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY;
     this.apiUrl = 'https://api.openai.com/v1/chat/completions';
+    // Configuration constants
+    this.MAX_DISCUSSION_TEXT_LENGTH = 4000;
   }
 
   /**
@@ -467,8 +469,9 @@ Rules:
     try {
       if (!this.apiKey) {
         console.warn('OpenAI API key not configured, returning truncated text');
-        const words = text.split(' ').slice(0, maxLength);
-        return words.join(' ') + (text.split(' ').length > maxLength ? '...' : '');
+        const words = text.split(' ');
+        const truncated = words.slice(0, maxLength).join(' ');
+        return truncated + (words.length > maxLength ? '...' : '');
       }
 
       const response = await axios.post(
@@ -499,8 +502,9 @@ Rules:
       return response.data.choices[0].message.content.trim();
     } catch (error) {
       console.error('Summary generation error:', error.message);
-      const words = text.split(' ').slice(0, maxLength);
-      return words.join(' ') + (text.split(' ').length > maxLength ? '...' : '');
+      const words = text.split(' ');
+      const truncated = words.slice(0, maxLength).join(' ');
+      return truncated + (words.length > maxLength ? '...' : '');
     }
   }
 
@@ -534,7 +538,7 @@ Rules:
             },
             {
               role: 'user',
-              content: discussionText.substring(0, 4000) // Limit input size
+              content: discussionText.substring(0, this.MAX_DISCUSSION_TEXT_LENGTH) // Limit input size
             }
           ],
           temperature: 0.5,
