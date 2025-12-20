@@ -115,20 +115,16 @@ const LoginScreen = ({ navigation }) => {
       style={styles.container}
     >
       <View style={styles.content}>
-        <LinearGradient
-          colors={COLORS.gradient.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.header}
-        >
-          <Text style={styles.title}>🎉 Community Hub</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>📚 Book Club</Text>
           <Text style={styles.subtitle}>Welcome back!</Text>
-        </LinearGradient>
+        </View>
 
         <View style={styles.form}>
           <TextInput
             style={styles.input}
             placeholder="Email or Username"
+            placeholderTextColor={COLORS.textSecondary}
             value={emailOrUsernameOrPhone}
             onChangeText={setEmailOrUsernameOrPhone}
             autoCapitalize="none"
@@ -138,6 +134,7 @@ const LoginScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor={COLORS.textSecondary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -250,16 +247,18 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: SPACING.xxl,
+    paddingVertical: SPACING.xl,
   },
   title: {
-    fontSize: 40,
+    fontSize: 36,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: COLORS.text,
     marginBottom: SPACING.sm,
   },
   subtitle: {
-    ...TYPOGRAPHY.h3,
+    fontSize: 18,
     color: COLORS.textSecondary,
+    fontWeight: '500',
   },
   form: {
     width: '100%',
@@ -272,6 +271,7 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     marginBottom: SPACING.md,
     fontSize: 16,
+    color: COLORS.text,
   },
   button: {
     backgroundColor: COLORS.primary,

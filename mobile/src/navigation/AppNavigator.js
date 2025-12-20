@@ -25,6 +25,9 @@ import DiaryScreen from '../screens/DiaryScreen';
 import AddDiaryEntryScreen from '../screens/AddDiaryEntryScreen';
 import PricingScreen from '../screens/PricingScreen';
 import TwoFactorSetupScreen from '../screens/TwoFactorSetupScreen';
+import AIModelsScreen from '../screens/AIModelsScreen';
+import CharacterChatScreen from '../screens/CharacterChatScreen';
+import PrebuiltCharacterChatScreen from '../screens/PrebuiltCharacterChatScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -168,8 +171,18 @@ const ProfileStack = () => (
     />
     <Stack.Screen 
       name="AIChats" 
-      component={AIChatsScreen}
+      component={AIModelsScreen}
       options={{ title: 'AI Chats' }}
+    />
+    <Stack.Screen 
+      name="CharacterChat" 
+      component={CharacterChatScreen}
+      options={{ title: 'Chat' }}
+    />
+    <Stack.Screen 
+      name="PrebuiltCharacterChat" 
+      component={PrebuiltCharacterChatScreen}
+      options={{ title: 'Chat' }}
     />
     <Stack.Screen 
       name="TwoFactorSetup" 

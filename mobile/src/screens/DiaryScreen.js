@@ -13,7 +13,7 @@ import {
   Switch
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { COLORS, SPACING, TYPOGRAPHY, API_URL } from '../constants';
 import localDiaryService from '../services/localDiaryService';
 
 const DiaryScreen = ({ route, navigation }) => {
@@ -35,7 +35,7 @@ const DiaryScreen = ({ route, navigation }) => {
 
   const loadUsage = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/diary/usage', {
+      const response = await fetch(`${API_URL}/diary/usage`, {
         headers: {
           'Authorization': `Bearer ${user?.access_token}`
         }
@@ -58,7 +58,7 @@ const DiaryScreen = ({ route, navigation }) => {
         setEntries(localEntries);
       } else {
         // Load from cloud
-        const response = await fetch(`http://localhost:5000/api/diary/book/${book.id}`, {
+        const response = await fetch(`${API_URL}/diary/book/${book.id}`, {
           headers: {
             'Authorization': `Bearer ${user?.access_token}`
           }
@@ -99,7 +99,7 @@ const DiaryScreen = ({ route, navigation }) => {
                 await localDiaryService.deleteEntry(entry.id);
                 setEntries(entries.filter(e => e.id !== entry.id));
               } else {
-                const response = await fetch(`http://localhost:5000/api/diary/${entry.id}`, {
+                const response = await fetch(`${API_URL}/diary/${entry.id}`, {
                   method: 'DELETE',
                   headers: {
                     'Authorization': `Bearer ${user?.access_token}`
@@ -167,7 +167,7 @@ const DiaryScreen = ({ route, navigation }) => {
     setAiAnalysis(null);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/diary/summarize/${book.id}`, {
+      const response = await fetch(`${API_URL}/diary/summarize/${book.id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${user?.access_token}`,

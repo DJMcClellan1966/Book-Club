@@ -12,7 +12,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { COLORS, SPACING, TYPOGRAPHY, API_URL } from '../constants';
 import localDiaryService from '../services/localDiaryService';
 
 const AddDiaryEntryScreen = ({ route, navigation }) => {
@@ -71,8 +71,8 @@ const AddDiaryEntryScreen = ({ route, navigation }) => {
       } else {
         // Save to cloud
         const url = isEditing
-          ? `http://localhost:5000/api/diary/${entry.id}`
-          : 'http://localhost:5000/api/diary';
+          ? `${API_URL}/diary/${entry.id}`
+          : `${API_URL}/diary`;
         
         const method = isEditing ? 'PUT' : 'POST';
         

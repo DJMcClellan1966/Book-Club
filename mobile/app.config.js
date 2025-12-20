@@ -1,0 +1,57 @@
+export default {
+  expo: {
+    name: "Book Club",
+    slug: "book-club",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "automatic",
+    newArchEnabled: true,
+    splash: {
+      image: "./assets/splash-icon.png",
+      resizeMode: "contain",
+      backgroundColor: "#6366f1"
+    },
+    assetBundlePatterns: [
+      "**/*"
+    ],
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: "com.bookclub.app",
+      buildNumber: "1.0.0",
+      infoPlist: {
+        NSCameraUsageDescription: "This app uses the camera to take profile pictures and share book photos.",
+        NSMicrophoneUsageDescription: "This app uses the microphone for voice chat in spaces.",
+        NSPhotoLibraryUsageDescription: "This app accesses your photos to share book images."
+      }
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#6366f1"
+      },
+      package: "com.bookclub.app",
+      versionCode: 1,
+      permissions: [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET"
+      ],
+      edgeToEdgeEnabled: true
+    },
+    web: {
+      favicon: "./assets/favicon.png",
+      bundler: "metro"
+    },
+    extra: {
+      eas: {
+        projectId: "your-project-id-here"
+      },
+      // Pass the CODESPACE_NAME from environment to the app
+      CODESPACE_NAME: process.env.CODESPACE_NAME
+    },
+    plugins: []
+  }
+};

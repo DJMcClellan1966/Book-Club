@@ -23,12 +23,14 @@ const AIModelsScreen = ({ navigation }) => {
   const { user } = useAuth();
   
   const [models, setModels] = useState([]);
+  const [prebuiltCharacters, setPrebuiltCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState('all'); // 'all', 'author', 'character'
+  const [filter, setFilter] = useState('all'); // 'all', 'author', 'character', 'prebuilt'
 
   useEffect(() => {
     loadModels();
+    loadPrebuiltCharacters();
   }, [filter]);
 
   /**
@@ -37,7 +39,7 @@ const AIModelsScreen = ({ navigation }) => {
   const loadModels = async () => {
     try {
       setLoading(true);
-      const params = filter !== 'all' ? { type: filter } : {};
+      const params = filter !== 'all' && filter !== 'prebuilt' ? { type: filter } : {};
       const response = await api.get('/fine-tune/models', { params });
       setModels(response.data.models || []);
     } catch (error) {
@@ -50,11 +52,31 @@ const AIModelsScreen = ({ navigation }) => {
   };
 
   /**
+   * Load pre-built characters
+   */
+  const loadPrebuiltCharacters = async () => {
+    try {
+      const response = await api.get('/prebuilt-characters');
+      setPrebuiltCharacters(response.data || []);
+    } catch (error) {
+      console.error('Error loading prebuilt characters:', error);
+    }
+  };
+
+  /**
    * Refresh models list
    */
   const handleRefresh = () => {
     setRefreshing(true);
     loadModels();
+    loadPrebuiltCharacters();
+  };
+
+  /**
+   * Navigate to chat with pre-built character
+   */
+  const openPrebuiltChat = (character) => {
+    navigation.navigate('PrebuiltCharacterChat', { character });
   };
 
   /**
@@ -131,6 +153,40 @@ const AIModelsScreen = ({ navigation }) => {
   };
 
   /**
+   * Render pre-built character card
+   */
+  const renderPrebuiltCharacter = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={styles.modelCard}
+        onPress={() => openPrebuiltChat(item)}
+      >
+        <View style={styles.modelHeader}>
+          <View style={styles.prebuiltIcon}>
+            <Text style={styles.prebuiltAvatar}>{item.avatar}</Text>
+          </View>
+          
+          <View style={styles.modelInfo}>
+            <Text style={styles.modelName}>{item.name}</Text>
+            <Text style={styles.modelBook}>{item.book}</Text>
+            <Text style={styles.modelAuthor}>by {item.author}</Text>
+          </View>
+
+          <View style={[styles.statusBadge, { backgroundColor: COLORS.success }]}>
+            <Text style={styles.statusText}>Ready</Text>
+          </View>
+        </View>
+
+        <Text style={styles.characterDescription}>{item.description}</Text>
+
+        <View style={styles.prebuiltBadge}>
+          <Text style={styles.prebuiltBadgeText}>✨ Pre-built Character</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  /**
    * Render individual model card
    */
   const renderModel = ({ item }) => {
@@ -200,6 +256,15 @@ const AIModelsScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={[styles.filterButton, filter === 'prebuilt' && styles.filterButtonActive]}
+        onPress={() => setFilter('prebuilt')}
+      >
+        <Text style={[styles.filterText, filter === 'prebuilt' && styles.filterTextActive]}>
+          ✨ Pre-built
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[styles.filterButton, filter === 'author' && styles.filterButtonActive]}
         onPress={() => setFilter('author')}
       >
@@ -229,27 +294,37 @@ const AIModelsScreen = ({ navigation }) => {
         </Text>
       </TouchableOpacity>
     </View>
-  );
-
-  /**
-   * Render empty state
-   */
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons name="chatbubbles-outline" size={64} color={COLORS.lightGray} />
-      <Text style={styles.emptyTitle}>No AI Models Yet</Text>
-      <Text style={styles.emptyText}>
-        Create fine-tuned AI models for authors and characters from your favorite books.
+        {filter === 'prebuilt' ? 'No Pre-built Characters' : 'No AI Models Yet'}
       </Text>
-      <TouchableOpacity
-        style={styles.createButton}
-        onPress={() => navigation.navigate('Books')}
-      >
-        <Ionicons name="add-circle" size={20} color={COLORS.white} />
-        <Text style={styles.createButtonText}>Browse Books</Text>
-      </TouchableOpacity>
+      <Text style={styles.emptyText}>
+        {filter === 'prebuilt' 
+          ? 'Pre-built characters will appear here once loaded.'
+          : 'Create fine-tuned AI models for authors and characters from your favorite books.'}
+      </Text>
+      {filter !== 'prebuilt' && (
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={() => navigation.navigate('Books')}
+        >
+          <Ionicons name="add-circle" size={20} color={COLORS.white} />
+          <Text style={styles.createButtonText}>Browse Books</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
+
+  // Get data based on filter
+  const getDisplayData = () => {
+    if (filter === 'prebuilt') {
+      return prebuiltCharacters;
+    } else if (filter === 'all') {
+      return [...models, ...prebuiltCharacters];
+    } else {
+      return models;
+    }
+  };
+
+  const displayData = getDisplayData();
 
   if (loading && !refreshing) {
     return (
@@ -262,6 +337,21 @@ const AIModelsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {renderFilters()}
+
+      <FlatList
+        data={displayData}
+        renderItem={(props) => {
+          // Check if it's a prebuilt character (has 'avatar' field)
+          if (props.item.isPrebuilt || props.item.avatar) {
+            return renderPrebuiltCharacter(props);
+          }
+          return renderModel(props);
+        }}
+        keyExtractor={item => item.id}
+        contentContainerStyle={[
+          styles.listContainer,
+          displayData{styles.container}>
       {renderFilters()}
 
       <FlatList
@@ -450,6 +540,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.primary,
+  prebuiltIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.lightBackground,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.md,
+  },
+  prebuiltAvatar: {
+    fontSize: 28,
+  },
+  characterDescription: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.mediumGray,
+    marginTop: SPACING.sm,
+    lineHeight: 18,
+  },
+  prebuiltBadge: {
+    marginTop: SPACING.sm,
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.lightPrimary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  prebuiltBadgeText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.xl,
     borderRadius: 24,

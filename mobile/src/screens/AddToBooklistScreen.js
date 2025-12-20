@@ -11,7 +11,7 @@ import {
   Image,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext.supabase';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { COLORS, SPACING, TYPOGRAPHY, API_URL } from '../constants';
 import ReviewsSummaryModal from '../components/ReviewsSummaryModal';
 
 const RATING_OPTIONS = [
@@ -40,7 +40,7 @@ const AddToBooklistScreen = ({ navigation, route }) => {
   const loadCommunityReviews = async () => {
     setLoadingReviews(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/books/${book.id}/reviews-summary`);
+      const response = await fetch(`${API_URL}/books/${book.id}/reviews-summary`);
       
       if (response.ok) {
         const data = await response.json();
@@ -65,7 +65,7 @@ const AddToBooklistScreen = ({ navigation, route }) => {
 
     setSummarizing(true);
     try {
-      const response = await fetch('http://localhost:5000/api/booklist/summarize-review', {
+      const response = await fetch(`${API_URL}/booklist/summarize-review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ const AddToBooklistScreen = ({ navigation, route }) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/booklist', {
+      const response = await fetch(`${API_URL}/booklist`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

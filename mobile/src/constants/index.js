@@ -1,13 +1,24 @@
 import { Platform } from 'react-native';
 
 // API Configuration
-// Replace 192.168.x.x with your computer's actual IP address
+// IMPORTANT FOR CODESPACES/REMOTE DEVELOPMENT:
+// When running on a physical device (iPhone), 'localhost' won't work.
+// You need to use your Codespaces forwarded URL or your computer's IP address.
+// 
+// For GitHub Codespaces:
+// 1. Check the "Ports" tab in VS Code
+// 2. Find port 5000 and copy the forwarded address
+// 3. Replace the URL below (it should look like: https://your-codespace-5000.app.github.dev/api)
+//
+// For local development on same network:
+// Use your computer's IP address like: http://192.168.1.100:5000/api
+
 export const API_URL = __DEV__ 
-  ? 'http://192.168.1.100:5000/api'  // Development - UPDATE THIS IP
-  : 'https://your-production-api.com/api'; // Production
+  ? 'https://friendly-system-45rwgqxq57h5g7q-5000.app.github.dev/api'
+  : 'https://your-production-api.com/api';
 
 export const SOCKET_URL = __DEV__
-  ? 'http://192.168.1.100:5000'  // Development - UPDATE THIS IP
+  ? 'https://friendly-system-45rwgqxq57h5g7q-5000.app.github.dev'
   : 'https://your-production-api.com';
 
 // App Colors - Modern Gradient Palette
@@ -15,6 +26,7 @@ export const COLORS = {
   primary: '#6366f1',
   primaryDark: '#4f46e5',
   primaryLight: '#818cf8',
+  lightPrimary: '#e0e7ff',
   secondary: '#8b5cf6',
   secondaryDark: '#7c3aed',
   accent: '#ec4899',
@@ -31,10 +43,13 @@ export const COLORS = {
   text: '#111827',
   textSecondary: '#6b7280',
   textLight: '#9ca3af',
+  mediumGray: '#6b7280',
+  lightGray: '#d1d5db',
   border: '#e5e7eb',
   borderLight: '#f3f4f6',
   background: '#f9fafb',
   backgroundDark: '#f3f4f6',
+  lightBackground: '#f3f4f6',
   card: '#ffffff',
   overlay: 'rgba(0, 0, 0, 0.5)',
   gradient: {

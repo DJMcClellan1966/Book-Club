@@ -213,12 +213,17 @@ export const authAPI = {
     await AsyncStorage.setItem('user_email', email);
     await AsyncStorage.setItem('user_display_name', profile.display_name || profile.username);
     
-    // Store sensitive credentials securely in Keychain
-    await Keychain.setGenericPassword(email, password, {
-      service: 'com.bookclub.credentials',
-      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
-      securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
-    });
+    // Store sensitive credentials securely in Keychain (optional, for biometric login)
+    try {
+      await Keychain.setGenericPassword(email, password, {
+        service: 'com.bookclub.credentials',
+        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+        securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
+      });
+    } catch (keychainError) {
+      // Keychain not available - this is fine, just means biometric login won't work
+      console.log('Keychain storage skipped:', keychainError.message);
+    }
 
     return {
       session: data.session,
@@ -230,19 +235,29 @@ export const authAPI = {
   },
 
   async logout() {
-    // Clear saved credentials before signing out
-    await AsyncStorage.removeItem('user_username');
-    await AsyncStorage.removeItem('user_email');
-    await AsyncStorage.removeItem('user_display_name');
-    await AsyncStorage.removeItem('mfa_biometric_enabled');
-    
-    // Clear secure credentials from Keychain
-    await Keychain.resetGenericPassword({
-      service: 'com.bookclub.credentials'
-    });
-    
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      // Clear saved credentials before signing out
+      await AsyncStorage.removeItem('user_username');
+      await AsyncStorage.removeItem('user_email');
+      await AsyncStorage.removeItem('user_display_name');
+      await AsyncStorage.removeItem('mfa_biometric_enabled');
+      
+      // Clear secure credentials from Keychain (optional feature)
+      try {
+        await Keychain.resetGenericPassword({
+          service: 'com.bookclub.credentials'
+        });
+      } catch (keychainError) {
+        // Keychain not available or not initialized - this is fine
+        console.log('Keychain cleanup skipped:', keychainError.message);
+      }
+      
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
   },
 
   async getCurrentUser() {

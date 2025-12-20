@@ -14,7 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useAuth } from '../context/AuthContext.supabase';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { COLORS, SPACING, TYPOGRAPHY, API_URL } from '../constants';
 import QRCode from 'react-native-qrcode-svg';
 
 const TwoFactorSetupScreen = ({ navigation }) => {
@@ -148,7 +148,7 @@ const TwoFactorSetupScreen = ({ navigation }) => {
     setLoading(true);
     try {
       // Call backend to send SMS
-      const response = await fetch('http://localhost:5000/api/auth/send-phone-verification', {
+      const response = await fetch(`${API_URL}/auth/send-phone-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: phoneNumber })

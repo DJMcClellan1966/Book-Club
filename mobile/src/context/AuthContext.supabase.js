@@ -128,7 +128,14 @@ export const AuthProvider = ({ children }) => {
       setSession(null);
     } catch (error) {
       console.error('Logout error:', error);
-      throw error;
+      // Even if logout fails, clear local state
+      setUser(null);
+      setSession(null);
+      // Re-throw only if it's a critical error
+      // Don't throw for keychain errors
+      if (!error.message?.includes('Keychain') && !error.message?.includes('resetGenericPassword')) {
+        throw error;
+      }
     }
   };
 

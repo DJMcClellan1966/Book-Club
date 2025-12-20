@@ -216,6 +216,10 @@ app.use('/api/diary', diaryRoutes);
 const fineTuneRoutes = require('./routes/fineTune');
 app.use('/api/fine-tune', fineTuneRoutes);
 
+// Pre-built Characters routes
+const prebuiltCharactersRoutes = require('./routes/prebuiltCharacters');
+app.use('/api/prebuilt-characters', prebuiltCharactersRoutes);
+
 // TODO: These routes use MongoDB models - need to convert to Supabase
 // Reviews routes
 // app.use('/api/reviews', require('./routes/reviews'));

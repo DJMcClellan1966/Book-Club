@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../context/AuthContext.supabase';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { COLORS, SPACING, TYPOGRAPHY, API_URL } from '../constants';
 
 const AddBookScreen = ({ navigation, route }) => {
   const { user } = useAuth();
@@ -39,7 +39,7 @@ const AddBookScreen = ({ navigation, route }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/books/search?query=${encodeURIComponent(searchQuery)}&type=${searchType}`,
+        `${API_URL}/books/search?query=${encodeURIComponent(searchQuery)}&type=${searchType}`,
         {
           headers: {
             'Authorization': `Bearer ${user?.access_token}`
@@ -80,7 +80,7 @@ const AddBookScreen = ({ navigation, route }) => {
       if (!result.canceled) {
         setLoading(true);
         
-        const response = await fetch('http://localhost:5000/api/books/search-by-image', {
+        const response = await fetch(`${API_URL}/books/search-by-image`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const AddBookScreen = ({ navigation, route }) => {
   const addBook = async (bookData, navigateToReview = false) => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/books/manual', {
+      const response = await fetch(`${API_URL}/books/manual`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

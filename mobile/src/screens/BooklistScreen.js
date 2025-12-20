@@ -12,7 +12,7 @@ import {
   Modal,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext.supabase';
-import { COLORS, SPACING, TYPOGRAPHY } from '../constants';
+import { COLORS, SPACING, TYPOGRAPHY, API_URL } from '../constants';
 import ReviewsSummaryModal from '../components/ReviewsSummaryModal';
 
 const RATING_OPTIONS = [
@@ -44,8 +44,8 @@ const BooklistScreen = ({ navigation }) => {
   const loadBooklist = async () => {
     try {
       const endpoint = filterRating 
-        ? `http://localhost:5000/api/booklist/by-rating/${filterRating}`
-        : 'http://localhost:5000/api/booklist/my-booklist';
+        ? `${API_URL}/booklist/by-rating/${filterRating}`
+        : `${API_URL}/booklist/my-booklist`;
       
       const response = await fetch(endpoint, {
         headers: {
@@ -66,7 +66,7 @@ const BooklistScreen = ({ navigation }) => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/booklist/stats', {
+      const response = await fetch(`${API_URL}/booklist/stats`, {
         headers: {
           'Authorization': `Bearer ${user?.access_token}`
         }
@@ -87,7 +87,7 @@ const BooklistScreen = ({ navigation }) => {
 
   const toggleFavorite = async (item) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/booklist/${item.id}`, {
+      const response = await fetch(`${API_URL}/booklist/${item.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const BooklistScreen = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await fetch(`http://localhost:5000/api/booklist/${item.id}`, {
+              await fetch(`${API_URL}/booklist/${item.id}`, {
                 method: 'DELETE',
                 headers: {
                   'Authorization': `Bearer ${user?.access_token}`
@@ -190,7 +190,7 @@ const BooklistScreen = ({ navigation }) => {
     setCommunityReviews(null);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/books/${item.book_id}/reviews-summary`);
+      const response = await fetch(`${API_URL}/books/${item.book_id}/reviews-summary`);
       
       if (response.ok) {
         const data = await response.json();
