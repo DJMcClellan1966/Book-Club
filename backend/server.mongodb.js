@@ -37,6 +37,7 @@ const userRoutes = require('./routes/users');
 const paymentRoutes = require('./routes/payments');
 const affiliateRoutes = require('./routes/affiliates');
 const aiChatRoutes = require('./routes/aichats');
+const aiRoutes = require('./routes/ai');
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -48,6 +49,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/affiliates', affiliateRoutes);
 app.use('/api/aichats', aiChatRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Socket.io for real-time features
 const activeUsers = new Map();
