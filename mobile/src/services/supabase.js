@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 import { Platform } from 'react-native';
 
 const supabaseUrl = 'https://hjgxujrxyilaeiemivcz.supabase.co';
@@ -45,8 +46,8 @@ export const authAPI = {
     // If email confirmation is required, these will be created after verification
     // For now, create them immediately but user won't be able to login until verified
     if (data.user) {
-      // Create profile
-      await supabase.from('profiles').insert({
+      // Create profile with all user data
+      const { error: profileError } = await supabase.from('profiles').insert({
         id: data.user.id,
         username,
         email,
@@ -54,16 +55,25 @@ export const authAPI = {
         email_verified: false
       });
 
+      if (profileError && !profileError.message.includes('duplicate key')) {
+        throw profileError;
+      }
+
       // Create free subscription
-      await supabase.from('subscriptions').insert({
+      const { error: subError } = await supabase.from('subscriptions').insert({
         user_id: data.user.id,
         tier: 'free',
         status: 'active'
       });
 
-      // Save username for later (don't save password for security)
+      if (subError && !subError.message.includes('duplicate key')) {
+        throw subError;
+      }
+
+      // Save username and email for later (after verification)
       await AsyncStorage.setItem('pending_verification_username', username);
       await AsyncStorage.setItem('pending_verification_email', email);
+      await AsyncStorage.setItem('pending_verification_display_name', displayName || username);
     }
 
     return data;
@@ -176,8 +186,10 @@ export const authAPI = {
       await supabase.from('profiles').insert({
         id: data.user.id,
         username: data.user.user_metadata?.username || data.user.email.split('@')[0],
+        display_name: data.user.user_metadata?.display_name || data.user.user_metadata?.username || data.user.email.split('@')[0],
         email: data.user.email,
-        phone_number: data.user.user_metadata?.phone_number
+        phone_number: data.user.user_metadata?.phone_number,
+        email_verified: true
       });
 
       await supabase.from('subscriptions').insert({
@@ -196,6 +208,18 @@ export const authAPI = {
       profile = newProfile;
     }
 
+    // Save non-sensitive data to AsyncStorage
+    await AsyncStorage.setItem('user_username', profile.username);
+    await AsyncStorage.setItem('user_email', email);
+    await AsyncStorage.setItem('user_display_name', profile.display_name || profile.username);
+    
+    // Store sensitive credentials securely in Keychain
+    await Keychain.setGenericPassword(email, password, {
+      service: 'com.bookclub.credentials',
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+      securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
+    });
+
     return {
       session: data.session,
       user: {
@@ -206,6 +230,17 @@ export const authAPI = {
   },
 
   async logout() {
+    // Clear saved credentials before signing out
+    await AsyncStorage.removeItem('user_username');
+    await AsyncStorage.removeItem('user_email');
+    await AsyncStorage.removeItem('user_display_name');
+    await AsyncStorage.removeItem('mfa_biometric_enabled');
+    
+    // Clear secure credentials from Keychain
+    await Keychain.resetGenericPassword({
+      service: 'com.bookclub.credentials'
+    });
+    
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   },
@@ -238,6 +273,49 @@ export const authAPI = {
 
     if (error) throw error;
     return data;
+  },
+
+  async getSavedCredentials() {
+    // Retrieve non-sensitive data from AsyncStorage
+    const username = await AsyncStorage.getItem('user_username');
+    const email = await AsyncStorage.getItem('user_email');
+    const displayName = await AsyncStorage.getItem('user_display_name');
+    
+    // Retrieve password from secure Keychain
+    let password = null;
+    try {
+      const credentials = await Keychain.getGenericPassword({
+        service: 'com.bookclub.credentials'
+      });
+      if (credentials) {
+        password = credentials.password;
+      }
+    } catch (error) {
+      console.log('Error retrieving credentials from Keychain:', error);
+    }
+    
+    return {
+      username,
+      email,
+      displayName,
+      password
+    };
+  },
+
+  async clearSavedCredentials() {
+    // Clear saved credentials (on logout)
+    await AsyncStorage.removeItem('user_username');
+    await AsyncStorage.removeItem('user_email');
+    await AsyncStorage.removeItem('user_display_name');
+    await AsyncStorage.removeItem('pending_verification_username');
+    await AsyncStorage.removeItem('pending_verification_email');
+    await AsyncStorage.removeItem('pending_verification_display_name');
+    await AsyncStorage.removeItem('mfa_biometric_enabled');
+    
+    // Clear secure credentials from Keychain
+    await Keychain.resetGenericPassword({
+      service: 'com.bookclub.credentials'
+    });
   }
 };
 

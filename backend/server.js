@@ -200,9 +200,25 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/auth.supabase');
 app.use('/api/auth', authRoutes);
 
+// Booklist routes
+const booklistRoutes = require('./routes/booklist');
+app.use('/api/booklist', booklistRoutes);
+
+// Books routes (Supabase-optimized)
+const booksRoutes = require('./routes/books');
+app.use('/api/books', booksRoutes);
+
+// Diary routes
+const diaryRoutes = require('./routes/diary');
+app.use('/api/diary', diaryRoutes);
+
+// Fine-tune routes (AI Character/Author Chat)
+const fineTuneRoutes = require('./routes/fineTune');
+app.use('/api/fine-tune', fineTuneRoutes);
+
 // TODO: These routes use MongoDB models - need to convert to Supabase
-// Books routes
-// app.use('/api/books', require('./routes/books'));
+// Reviews routes
+// app.use('/api/reviews', require('./routes/reviews'));
 
 // Reviews routes
 // app.use('/api/reviews', require('./routes/reviews'));

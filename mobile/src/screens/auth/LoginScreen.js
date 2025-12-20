@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as Keychain from 'react-native-keychain';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../context/AuthContext.supabase';
 import { COLORS, SPACING, TYPOGRAPHY, SHADOWS } from '../../constants';
@@ -47,18 +48,20 @@ const LoginScreen = ({ navigation }) => {
       });
 
       if (result.success) {
-        // Get saved credentials
-        const savedEmail = await AsyncStorage.getItem('user_email');
-        const savedPassword = await AsyncStorage.getItem('biometric_password');
+        // Get saved credentials from Keychain
+        const credentials = await Keychain.getGenericPassword({
+          service: 'com.bookclub.credentials'
+        });
         
-        if (savedEmail && savedPassword) {
-          await login(savedEmail, savedPassword);
+        if (credentials) {
+          await login(credentials.username, credentials.password);
         } else {
-          Alert.alert('Error', 'No saved credentials found');
+          Alert.alert('Error', 'No saved credentials found. Please login with password first.');
         }
       }
     } catch (error) {
-      Alert.alert('Authentication Failed', 'Please try again');
+      Alert.alert('Authentication Failed', 'Please try again or use password login');
+      console.error('Biometric login error:', error);
     }
   };
 

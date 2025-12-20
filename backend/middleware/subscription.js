@@ -1,5 +1,29 @@
 const Subscription = require('../models/Subscription');
 
+// Subscription tier limits
+const TIER_LIMITS = {
+  free: {
+    diaryBooks: 2,
+    maxBooklistSize: 50,
+    aiChatsPerMonth: 5
+  },
+  premium: {
+    diaryBooks: 10,
+    maxBooklistSize: 200,
+    aiChatsPerMonth: 50
+  },
+  pro: {
+    diaryBooks: Infinity,
+    maxBooklistSize: Infinity,
+    aiChatsPerMonth: Infinity
+  }
+};
+
+// Get limits for a subscription tier
+const getTierLimits = (tier) => {
+  return TIER_LIMITS[tier] || TIER_LIMITS.free;
+};
+
 // Middleware to check if user has premium access
 const requirePremium = async (req, res, next) => {
   try {
@@ -139,5 +163,7 @@ module.exports = {
   requirePro,
   checkFeatureAccess,
   checkResourceLimit,
-  attachSubscription
+  attachSubscription,
+  getTierLimits,
+  TIER_LIMITS
 };

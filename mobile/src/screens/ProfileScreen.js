@@ -31,7 +31,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const menuItems = [
     { icon: 'person-outline', title: 'Edit Profile', onPress: () => {} },
-    { icon: 'list-outline', title: 'My Reading List', onPress: () => {} },
+    { icon: 'book-outline', title: 'My Booklist', onPress: () => navigation.navigate('Booklist') },
     { icon: 'shield-checkmark-outline', title: 'Two-Factor Authentication', onPress: () => navigation.navigate('TwoFactorSetup'), badge: user?.two_factor_enabled ? '✓ Enabled' : null },
     { icon: 'sparkles-outline', title: 'AI Chats', onPress: handleAIChatsPress },
     { icon: 'card-outline', title: 'Subscription', onPress: () => navigation.navigate('Pricing') },

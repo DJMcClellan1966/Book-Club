@@ -18,6 +18,11 @@ import SpacesScreen from '../screens/SpacesScreen';
 import SpaceDetailScreen from '../screens/SpaceDetailScreen';
 import AIChatsScreen from '../screens/AIChatsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import BooklistScreen from '../screens/BooklistScreen';
+import AddBookScreen from '../screens/AddBookScreen';
+import AddToBooklistScreen from '../screens/AddToBooklistScreen';
+import DiaryScreen from '../screens/DiaryScreen';
+import AddDiaryEntryScreen from '../screens/AddDiaryEntryScreen';
 import PricingScreen from '../screens/PricingScreen';
 import TwoFactorSetupScreen from '../screens/TwoFactorSetupScreen';
 
@@ -130,6 +135,31 @@ const ProfileStack = () => (
       name="ProfileMain" 
       component={ProfileScreen}
       options={{ title: 'My Profile' }}
+    />
+    <Stack.Screen 
+      name="Booklist" 
+      component={BooklistScreen}
+      options={{ title: 'My Booklist' }}
+    />
+    <Stack.Screen 
+      name="AddBook" 
+      component={AddBookScreen}
+      options={{ title: 'Add Book' }}
+    />
+    <Stack.Screen 
+      name="AddToBooklist" 
+      component={AddToBooklistScreen}
+      options={{ title: 'Rate & Review' }}
+    />
+    <Stack.Screen 
+      name="Diary" 
+      component={DiaryScreen}
+      options={{ title: 'Book Diary' }}
+    />
+    <Stack.Screen 
+      name="AddDiaryEntry" 
+      component={AddDiaryEntryScreen}
+      options={{ title: 'Write Entry' }}
     />
     <Stack.Screen 
       name="Pricing" 
