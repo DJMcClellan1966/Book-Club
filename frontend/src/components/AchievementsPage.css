@@ -1,0 +1,348 @@
+.achievements-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.achievements-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.achievements-header {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-content h2 {
+  font-size: 32px;
+  margin: 0;
+}
+
+.achievements-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 16px 24px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.stat-divider {
+  font-size: 24px;
+  opacity: 0.5;
+}
+
+.progress-section {
+  max-width: 600px;
+}
+
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}
+
+.progress-percentage {
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 30px;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #6366f1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover:not(.active) {
+  color: #1a1a2e;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.achievement-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.achievement-card.earned::before {
+  opacity: 1;
+}
+
+.achievement-card.earned {
+  border: 2px solid #f0fdf4;
+}
+
+.achievement-card.locked {
+  opacity: 0.6;
+  filter: grayscale(40%);
+}
+
+.achievement-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-icon-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.achievement-icon {
+  font-size: 64px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.achievement-card.locked .achievement-icon {
+  filter: grayscale(100%) opacity(0.5);
+}
+
+.earned-badge {
+  position: absolute;
+  top: -8px;
+  right: calc(50% - 40px);
+  width: 32px;
+  height: 32px;
+  background: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.achievement-content {
+  text-align: center;
+}
+
+.achievement-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 8px 0;
+}
+
+.achievement-card.locked .achievement-title {
+  color: #9ca3af;
+}
+
+.achievement-description {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  min-height: 42px;
+}
+
+.achievement-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.achievement-category {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.achievement-card.earned .achievement-category {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.achievement-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.achievements-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px dashed #d1d5db;
+}
+
+.achievements-empty p {
+  color: #6b7280;
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .achievements-header {
+    padding: 24px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .header-content h2 {
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .achievements-stats {
+    justify-content: center;
+  }
+
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+/* Special effects for rare achievements */
+.achievement-card.earned[data-rarity="legendary"] {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 2px solid #f59e0b;
+}
+
+.achievement-card.earned[data-rarity="legendary"]::before {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  height: 6px;
+}
+
+.achievement-card.earned[data-rarity="legendary"] .achievement-icon {
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8));
+  }
+}

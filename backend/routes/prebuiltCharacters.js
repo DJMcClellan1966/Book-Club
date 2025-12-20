@@ -28,7 +28,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const { PREBUILT_CHARACTERS } = require('../config/prebuiltCharacters');
 const { supabase } = require('../config/supabase');
-const { authenticateToken } = require('../middleware/auth.supabase');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const { 
   validateChatMessage, 
   validateCharacterId, 
@@ -40,13 +40,12 @@ const { getAllPublicCharacters } = require('../config/prebuiltCharacters');
 
 // Validate OpenAI API key exists
 if (!process.env.OPENAI_API_KEY) {
-  console.error('FATAL: OPENAI_API_KEY environment variable is not set');
-  process.exit(1);
+  console.warn('WARNING: OPENAI_API_KEY environment variable is not set - AI chat features will not work');
 }
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
-});
+}) : null;
 
 /**
  * In-memory cache for character list
@@ -269,7 +268,7 @@ router.get('/:characterId', validateCharacterId, (req, res) => {
  */
 router.post(
   '/:characterId/chat', 
-  authenticateToken,
+  authenticateUser,
   validateCharacterId,
   validateChatMessage,
   chatRateLimiter,
@@ -484,7 +483,7 @@ router.post(
  */
 router.get(
   '/:characterId/conversations', 
-  authenticateToken,
+  authenticateUser,
   validateCharacterId,
   async (req, res) => {
     try {
@@ -548,7 +547,7 @@ router.get(
  */
 router.delete(
   '/conversations/:conversationId',
-  authenticateToken,
+  authenticateUser,
   validateUUID('conversationId'),
   async (req, res) => {
     try {

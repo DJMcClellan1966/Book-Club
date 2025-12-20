@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
 const fineTuningService = require('../services/fineTuningService');
-const { authenticateToken } = require('../middleware/auth.supabase');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 /**
  * Fine-Tuning Routes
@@ -14,7 +14,7 @@ const { authenticateToken } = require('../middleware/auth.supabase');
  * Start fine-tuning for an author
  * Body: { authorName, bookId, bookInfo: { title, description, genre } }
  */
-router.post('/author', authenticateToken, async (req, res) => {
+router.post('/author', authenticateUser, async (req, res) => {
   try {
     const { authorName, bookId, bookInfo } = req.body;
     const userId = req.user.id;
@@ -85,7 +85,7 @@ router.post('/author', authenticateToken, async (req, res) => {
  * Start fine-tuning for a character
  * Body: { characterName, characterDescription, bookId, bookInfo: { title, author } }
  */
-router.post('/character', authenticateToken, async (req, res) => {
+router.post('/character', authenticateUser, async (req, res) => {
   try {
     const { characterName, characterDescription, bookId, bookInfo } = req.body;
     const userId = req.user.id;
@@ -165,7 +165,7 @@ router.post('/character', authenticateToken, async (req, res) => {
  * Quick fine-tune for new character (simplified, faster)
  * Body: { type: 'author'|'character', entityName, description, bookInfo }
  */
-router.post('/quick', authenticateToken, async (req, res) => {
+router.post('/quick', authenticateUser, async (req, res) => {
   try {
     const { type, entityName, description, bookInfo, bookId } = req.body;
     const userId = req.user.id;
@@ -237,7 +237,7 @@ router.post('/quick', authenticateToken, async (req, res) => {
  * GET /api/fine-tune/status/:modelId
  * Check training status of a model
  */
-router.get('/status/:modelId', authenticateToken, async (req, res) => {
+router.get('/status/:modelId', authenticateUser, async (req, res) => {
   try {
     const { modelId } = req.params;
 
@@ -298,7 +298,7 @@ router.get('/status/:modelId', authenticateToken, async (req, res) => {
  * Chat with a fine-tuned model
  * Body: { message, conversationId (optional) }
  */
-router.post('/chat/:modelId', authenticateToken, async (req, res) => {
+router.post('/chat/:modelId', authenticateUser, async (req, res) => {
   try {
     const { modelId } = req.params;
     const { message, conversationId } = req.body;
@@ -397,7 +397,7 @@ router.post('/chat/:modelId', authenticateToken, async (req, res) => {
  * GET /api/fine-tune/models
  * Get all fine-tuned models (user's own + public models)
  */
-router.get('/models', authenticateToken, async (req, res) => {
+router.get('/models', authenticateUser, async (req, res) => {
   try {
     const userId = req.user.id;
     const { type, bookId } = req.query;
@@ -436,7 +436,7 @@ router.get('/models', authenticateToken, async (req, res) => {
  * GET /api/fine-tune/conversations/:modelId
  * Get conversation history for a model
  */
-router.get('/conversations/:modelId', authenticateToken, async (req, res) => {
+router.get('/conversations/:modelId', authenticateUser, async (req, res) => {
   try {
     const { modelId } = req.params;
     const userId = req.user.id;
@@ -483,7 +483,7 @@ router.get('/conversations/:modelId', authenticateToken, async (req, res) => {
  * DELETE /api/fine-tune/:modelId
  * Delete a fine-tuned model (only owner can delete)
  */
-router.delete('/:modelId', authenticateToken, async (req, res) => {
+router.delete('/:modelId', authenticateUser, async (req, res) => {
   try {
     const { modelId } = req.params;
     const userId = req.user.id;

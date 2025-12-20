@@ -22,6 +22,9 @@ import AIChats from './pages/AIChats';
 
 // Import components
 import Navbar from './components/Navbar';
+import GoalsDashboard from './components/GoalsDashboard';
+import ChallengesPage from './components/ChallengesPage';
+import AchievementsPage from './components/AchievementsPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -70,6 +73,21 @@ function App() {
                 <Route path="/ai-chats" element={
                   <ProtectedRoute>
                     <AIChats />
+                  </ProtectedRoute>
+                } />
+                <Route path="/goals" element={
+                  <ProtectedRoute>
+                    <GoalsDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/challenges" element={
+                  <ProtectedRoute>
+                    <ChallengesPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/achievements" element={
+                  <ProtectedRoute>
+                    <AchievementsPage />
                   </ProtectedRoute>
                 } />
               </Routes>

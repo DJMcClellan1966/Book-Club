@@ -21,6 +21,9 @@ const Navbar = () => {
           {user ? (
             <>
               <li><Link to="/dashboard">Dashboard</Link></li>
+              <li><Link to="/goals">🎯 Goals</Link></li>
+              <li><Link to="/challenges">🏆 Challenges</Link></li>
+              <li><Link to="/achievements">🏅 Badges</Link></li>
               <li><Link to="/ai-chats">🎭 AI Chats</Link></li>
               <li><Link to={`/profile/${user.id}`}>Profile</Link></li>
               <li>

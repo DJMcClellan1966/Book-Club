@@ -9,6 +9,9 @@ const { supabase, supabaseAdmin } = require('./config/supabase');
 
 const app = express();
 
+// Trust proxy - required for rate limiting behind proxies/load balancers
+app.set('trust proxy', 1);
+
 // ============================================
 // SECURITY & PERFORMANCE MIDDLEWARE
 // ============================================
@@ -219,6 +222,22 @@ app.use('/api/fine-tune', fineTuneRoutes);
 // Pre-built Characters routes
 const prebuiltCharactersRoutes = require('./routes/prebuiltCharacters');
 app.use('/api/prebuilt-characters', prebuiltCharactersRoutes);
+
+// Reading Goals routes
+const readingGoalsRoutes = require('./routes/readingGoals');
+app.use('/api/reading-goals', readingGoalsRoutes);
+
+// Challenges routes
+const challengesRoutes = require('./routes/challenges');
+app.use('/api/challenges', challengesRoutes);
+
+// Achievements routes
+const achievementsRoutes = require('./routes/achievements');
+app.use('/api/achievements', achievementsRoutes);
+
+// Streaks routes
+const streaksRoutes = require('./routes/streaks');
+app.use('/api/streaks', streaksRoutes);
 
 // TODO: These routes use MongoDB models - need to convert to Supabase
 // Reviews routes

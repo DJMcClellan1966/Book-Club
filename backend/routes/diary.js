@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
-const { authenticate } = require('../middleware/auth.supabase');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const { getTierLimits } = require('../middleware/subscription');
 const axios = require('axios');
 
 // Get diary usage and limits for current user
-router.get('/usage', authenticate, async (req, res) => {
+router.get('/usage', authenticateUser, async (req, res) => {
   try {
     const userId = req.user.id;
     
@@ -48,7 +48,7 @@ router.get('/usage', authenticate, async (req, res) => {
 });
 
 // Get all diary entries for a specific book
-router.get('/book/:bookId', authenticate, async (req, res) => {
+router.get('/book/:bookId', authenticateUser, async (req, res) => {
   try {
     const { bookId } = req.params;
     const userId = req.user.id;
@@ -70,7 +70,7 @@ router.get('/book/:bookId', authenticate, async (req, res) => {
 });
 
 // Get a single diary entry
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -96,7 +96,7 @@ router.get('/:id', authenticate, async (req, res) => {
 });
 
 // Create a new diary entry
-router.post('/', authenticate, async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const { bookId, entryText } = req.body;
     const userId = req.user.id;
@@ -190,7 +190,7 @@ router.post('/', authenticate, async (req, res) => {
 });
 
 // Update a diary entry
-router.put('/:id', authenticate, async (req, res) => {
+router.put('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     const { entryText } = req.body;
@@ -226,7 +226,7 @@ router.put('/:id', authenticate, async (req, res) => {
 });
 
 // Delete a diary entry
-router.delete('/:id', authenticate, async (req, res) => {
+router.delete('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -247,7 +247,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 });
 
 // AI-powered diary analysis and insights
-router.post('/summarize/:bookId', authenticate, async (req, res) => {
+router.post('/summarize/:bookId', authenticateUser, async (req, res) => {
   try {
     const { bookId } = req.params;
     const userId = req.user.id;

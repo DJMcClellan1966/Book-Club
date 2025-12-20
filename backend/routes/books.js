@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { supabase } = require('../config/supabase');
-const { authenticateToken } = require('../middleware/auth.supabase');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 // Get aggregated reviews and ratings summary for a book
 router.get('/:bookId/reviews-summary', async (req, res) => {
@@ -200,7 +200,7 @@ router.get('/isbn/:isbn', async (req, res) => {
 });
 
 // Add book manually to database
-router.post('/manual', authenticateToken, async (req, res) => {
+router.post('/manual', authenticateUser, async (req, res) => {
   try {
     const { 
       title, 
@@ -268,7 +268,7 @@ router.post('/manual', authenticateToken, async (req, res) => {
 });
 
 // Search by image using Google Cloud Vision API
-router.post('/search-by-image', authenticateToken, async (req, res) => {
+router.post('/search-by-image', authenticateUser, async (req, res) => {
   try {
     const { imageBase64 } = req.body;
 

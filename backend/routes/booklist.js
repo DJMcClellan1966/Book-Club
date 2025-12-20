@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
-const { authenticateToken } = require('../middleware/auth.supabase');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 // Get user's booklist
-router.get('/my-booklist', authenticateToken, async (req, res) => {
+router.get('/my-booklist', authenticateUser, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('user_booklist')
@@ -67,7 +67,7 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Get booklist by rating
-router.get('/by-rating/:rating', authenticateToken, async (req, res) => {
+router.get('/by-rating/:rating', authenticateUser, async (req, res) => {
   try {
     const { rating } = req.params;
     
@@ -102,7 +102,7 @@ router.get('/by-rating/:rating', authenticateToken, async (req, res) => {
 });
 
 // Get favorite books
-router.get('/favorites', authenticateToken, async (req, res) => {
+router.get('/favorites', authenticateUser, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('user_booklist')
@@ -130,7 +130,7 @@ router.get('/favorites', authenticateToken, async (req, res) => {
 });
 
 // Add book to booklist
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const { bookId, rating, reviewText, finishedDate, isFavorite } = req.body;
 
@@ -181,7 +181,7 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Update book in booklist
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     const { rating, reviewText, finishedDate, isFavorite } = req.body;
@@ -229,7 +229,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // Delete book from booklist
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -248,7 +248,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 });
 
 // Get booklist stats
-router.get('/stats', authenticateToken, async (req, res) => {
+router.get('/stats', authenticateUser, async (req, res) => {
   try {
     const { data: profile } = await supabase
       .from('profiles')
@@ -286,7 +286,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
 });
 
 // Generate AI summary for review
-router.post('/summarize-review', authenticateToken, async (req, res) => {
+router.post('/summarize-review', authenticateUser, async (req, res) => {
   try {
     const { reviewText } = req.body;
 
