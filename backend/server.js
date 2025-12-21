@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const { supabase, supabaseAdmin } = require('./config/supabase');
@@ -46,8 +47,17 @@ app.use(compression({
 }));
 
 // CORS with credentials
+const corsOrigin = process.env.NODE_ENV === 'production' 
+  ? process.env.CLIENT_URL 
+  : (process.env.CLIENT_URL || 'http://localhost:3000');
+
+if (process.env.NODE_ENV === 'production' && !corsOrigin) {
+  console.error('FATAL: CLIENT_URL must be set in production');
+  process.exit(1);
+}
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: corsOrigin,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -121,7 +131,7 @@ app.use((req, res, next) => {
 
 // Request ID for tracing
 app.use((req, res, next) => {
-  req.id = Math.random().toString(36).substring(7);
+  req.id = crypto.randomBytes(8).toString('hex');
   res.setHeader('X-Request-ID', req.id);
   next();
 });
@@ -143,21 +153,34 @@ app.get('/health', async (req, res) => {
       throw error;
     }
     
+    const memUsage = process.memoryUsage();
     res.json({
+      success: true,
       status: 'healthy',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      database: 'connected',
       memory: {
-        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+        used: Math.round(memUsage.heapUsed / 1024 / 1024),
+        total: Math.round(memUsage.heapTotal / 1024 / 1024),
+        rss: Math.round(memUsage.rss / 1024 / 1024)
       },
-      database: 'connected'
+      services: {
+        auth: 'operational',
+        database: 'connected',
+        ai: process.env.OPENAI_API_KEY ? 'configured' : 'not_configured'
+      }
     });
   } catch (error) {
     res.status(503).json({
+      success: false,
       status: 'unhealthy',
+      timestamp: new Date().toISOString(),
       error: error.message,
-      timestamp: new Date().toISOString()
+      services: {
+        database: 'disconnected'
+      }
     });
   }
 });
@@ -180,6 +203,96 @@ app.get('/metrics', (req, res) => {
   });
 });
 
+// API Documentation endpoint
+app.get('/api/docs', (req, res) => {
+  res.json({
+    success: true,
+    title: 'Book Club API Documentation',
+    version: '2.0.0',
+    baseUrl: process.env.API_URL || 'http://localhost:' + (process.env.PORT || 5000),
+    database: 'Supabase (PostgreSQL)',
+    authentication: {
+      type: 'Bearer Token (JWT)',
+      location: 'Authorization header',
+      example: 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      description: 'Obtain token from /api/auth/login endpoint'
+    },
+    endpoints: {
+      system: {
+        health: { method: 'GET', path: '/health', description: 'Server health check with service status', auth: false },
+        metrics: { method: 'GET', path: '/metrics', description: 'Performance metrics and resource usage', auth: false },
+        docs: { method: 'GET', path: '/api/docs', description: 'This documentation', auth: false }
+      },
+      authentication: {
+        register: { method: 'POST', path: '/api/auth/register', description: 'Create new user account', auth: false },
+        login: { method: 'POST', path: '/api/auth/login', description: 'Authenticate and get JWT token', auth: false },
+        logout: { method: 'POST', path: '/api/auth/logout', description: 'Invalidate current session', auth: true },
+        profile: { method: 'GET', path: '/api/auth/profile', description: 'Get authenticated user profile', auth: true }
+      },
+      books: {
+        list: { method: 'GET', path: '/api/books', description: 'List all books', auth: false, query: ['page', 'limit', 'search', 'genre'] },
+        get: { method: 'GET', path: '/api/books/:id', description: 'Get book details', auth: false },
+        reviews: { method: 'GET', path: '/api/books/:id/reviews', description: 'Get book reviews', auth: false }
+      },
+      booklist: {
+        myList: { method: 'GET', path: '/api/booklist/my-booklist', description: 'Get user\'s personal reading list', auth: true },
+        addBook: { method: 'POST', path: '/api/booklist/add', description: 'Add book to reading list', auth: true },
+        updateStatus: { method: 'PUT', path: '/api/booklist/:bookId', description: 'Update book reading status', auth: true },
+        removeBook: { method: 'DELETE', path: '/api/booklist/:bookId', description: 'Remove book from list', auth: true }
+      },
+      diary: {
+        entries: { method: 'GET', path: '/api/diary', description: 'List reading diary entries', auth: true },
+        create: { method: 'POST', path: '/api/diary', description: 'Create new diary entry', auth: true },
+        update: { method: 'PUT', path: '/api/diary/:id', description: 'Update diary entry', auth: true }
+      },
+      challenges: {
+        list: { method: 'GET', path: '/api/challenges', description: 'List active reading challenges', auth: false },
+        join: { method: 'POST', path: '/api/challenges/:id/join', description: 'Join a challenge', auth: true },
+        progress: { method: 'GET', path: '/api/challenges/:id/progress', description: 'Get challenge progress', auth: true }
+      },
+      achievements: {
+        catalog: { method: 'GET', path: '/api/achievements/catalog', description: 'List all achievements', auth: false },
+        userAchievements: { method: 'GET', path: '/api/achievements/my-achievements', description: 'Get user achievements', auth: true }
+      },
+      streaks: {
+        current: { method: 'GET', path: '/api/streaks/my-streak', description: 'Get current reading streak', auth: true },
+        update: { method: 'POST', path: '/api/streaks/update', description: 'Update reading streak', auth: true }
+      },
+      goals: {
+        list: { method: 'GET', path: '/api/reading-goals', description: 'List reading goals', auth: true },
+        create: { method: 'POST', path: '/api/reading-goals', description: 'Create reading goal', auth: true }
+      },
+      characters: {
+        list: { method: 'GET', path: '/api/prebuilt-characters', description: 'List prebuilt AI characters', auth: false },
+        chat: { method: 'POST', path: '/api/prebuilt-characters/:id/chat', description: 'Chat with AI character', auth: true }
+      }
+    },
+    errorHandling: {
+      validationError: { code: 'validation_error', status: 400, description: 'Request validation failed' },
+      authError: { code: 'auth_error', status: 401, description: 'Authentication required or failed' },
+      databaseError: { code: 'database_error', status: 400, description: 'Database operation failed' },
+      notFoundError: { code: 'not_found', status: 404, description: 'Resource not found' },
+      serverError: { code: 'internal_error', status: 500, description: 'Internal server error' }
+    },
+    rateLimit: {
+      general: '100 requests per 15 minutes',
+      auth: '5 attempts per 15 minutes',
+      search: '30 requests per minute'
+    },
+    security: {
+      https: process.env.NODE_ENV === 'production',
+      csrfProtection: 'Supabase JWT-based',
+      corsOrigins: process.env.CLIENT_URL || '*',
+      requestIdTracking: 'X-Request-ID header',
+      secureCookie: process.env.NODE_ENV === 'production'
+    },
+    contactInfo: {
+      support: 'support@bookclub.example.com',
+      issues: 'github.com/your-org/book-club/issues'
+    }
+  });
+});
+
 // ============================================
 // ROUTES
 // ============================================
@@ -187,14 +300,18 @@ app.get('/metrics', (req, res) => {
 // Root route
 app.get('/', (req, res) => {
   res.json({
-    message: 'Book Club API with Supabase',
+    success: true,
     status: 'running',
+    message: 'Book Club API with Supabase',
     version: '2.0.0',
     database: 'Supabase (PostgreSQL)',
-    endpoints: {
-      health: '/health',
-      metrics: '/metrics',
-      auth: '/api/auth/*'
+    documentation: '/api/docs',
+    quickStart: {
+      docs: 'GET /api/docs',
+      register: 'POST /api/auth/register',
+      login: 'POST /api/auth/login',
+      books: 'GET /api/books',
+      health: 'GET /health'
     }
   });
 });
@@ -239,31 +356,6 @@ app.use('/api/achievements', achievementsRoutes);
 const streaksRoutes = require('./routes/streaks');
 app.use('/api/streaks', streaksRoutes);
 
-// TODO: These routes use MongoDB models - need to convert to Supabase
-// Reviews routes
-// app.use('/api/reviews', require('./routes/reviews'));
-
-// Reviews routes
-// app.use('/api/reviews', require('./routes/reviews'));
-
-// Forums routes
-// app.use('/api/forums', require('./routes/forums'));
-
-// Spaces routes
-// app.use('/api/spaces', require('./routes/spaces'));
-
-// AI Chats routes
-// app.use('/api/ai-chats', require('./routes/aiChats'));
-
-// User routes
-// app.use('/api/users', require('./routes/users'));
-
-// Payments routes
-// app.use('/api/payments', require('./routes/payments'));
-
-// Affiliates routes
-// app.use('/api/affiliates', require('./routes/affiliates'));
-
 // ============================================
 // ERROR HANDLING
 // ============================================
@@ -271,43 +363,63 @@ app.use('/api/streaks', streaksRoutes);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
-    error: 'Not Found',
-    message: `Cannot ${req.method} ${req.path}`,
+    success: false,
+    error: 'not_found',
+    message: `Endpoint not found`,
+    details: {
+      method: req.method,
+      path: req.path,
+      hint: 'Check the API documentation for valid endpoints'
+    },
     requestId: req.id
   });
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(`[ERROR ${req.id}]`, err);
+  const errorId = req.id;
+  const errorMessage = err.message || 'Internal Server Error';
+  const showDetails = process.env.NODE_ENV !== 'production';
+  
+  // Log error internally (sanitized - no sensitive data)
+  console.error(`[ERROR ${errorId}]`, {
+    message: errorMessage,
+    status: err.status || 500,
+    method: req.method,
+    path: req.path
+  });
   
   // Supabase errors
   if (err.code) {
     return res.status(400).json({
-      error: 'Database Error',
-      message: err.message,
-      code: err.code,
-      requestId: req.id
+      success: false,
+      error: 'database_error',
+      message: showDetails ? errorMessage : 'A database error occurred',
+      ...(showDetails && { code: err.code }),
+      requestId: errorId,
+      help: 'If this problem persists, please contact support'
     });
   }
   
   // Validation errors
   if (err.name === 'ValidationError') {
     return res.status(400).json({
-      error: 'Validation Error',
-      message: err.message,
-      requestId: req.id
+      success: false,
+      error: 'validation_error',
+      message: errorMessage,
+      requestId: errorId,
+      details: err.details || []
     });
   }
   
-  // Default error
+  // Default error - never expose internal details in production
   res.status(err.status || 500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'production' 
-      ? 'An unexpected error occurred' 
-      : err.message,
-    requestId: req.id,
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+    success: false,
+    error: 'internal_error',
+    message: showDetails ? errorMessage : 'An unexpected error occurred',
+    requestId: errorId,
+    ...(showDetails && { stack: err.stack }),
+    help: 'Please reference the requestId in support communications'
   });
 });
 

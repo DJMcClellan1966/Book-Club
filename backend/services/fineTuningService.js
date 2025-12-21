@@ -10,6 +10,9 @@ const { supabase } = require('../config/supabase');
 class FineTuningService {
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY;
+    if (!this.apiKey) {
+      console.warn('Warning: OPENAI_API_KEY not configured. Fine-tuning features will be unavailable.');
+    }
     this.apiUrl = 'https://api.openai.com/v1';
   }
 
@@ -18,6 +21,10 @@ class FineTuningService {
    * Creates conversation examples that mimic the author's voice
    */
   async generateAuthorTrainingData(authorName, bookInfo) {
+    if (!this.apiKey) {
+      throw new Error('OpenAI API key not configured. Cannot generate training data.');
+    }
+    
     const examples = [];
     
     // Generate 20-30 conversation examples

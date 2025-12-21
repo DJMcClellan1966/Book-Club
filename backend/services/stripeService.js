@@ -1,9 +1,18 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.warn('Warning: STRIPE_SECRET_KEY not configured. Payment features will be unavailable.');
+}
+
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+  : null;
 
 class StripeService {
   // Create a new customer
   async createCustomer(email, name) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY in environment variables.');
+      }
       const customer = await stripe.customers.create({
         email,
         name,

@@ -1,9 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
+const crypto = require('crypto');
+const { body } = require('express-validator');
+const { validate } = require('../middleware/requestValidation');
 
 // Register
-router.post('/register', async (req, res) => {
+router.post(
+  '/register',
+  validate([
+    body('username').isString().trim().isLength({ min: 3, max: 30 }).withMessage('username must be 3-30 characters'),
+    body('password').isString().isLength({ min: 8, max: 128 }).withMessage('password must be 8-128 characters'),
+    body('email').optional({ checkFalsy: true }).isEmail().withMessage('email must be valid').normalizeEmail(),
+    body('phone').optional({ checkFalsy: true }).isString().withMessage('phone must be a string'),
+    body('countryCode').optional({ checkFalsy: true }).matches(/^\+\d{1,3}$/).withMessage('countryCode must look like +1'),
+    body('displayName').optional({ checkFalsy: true }).isString().trim().isLength({ min: 1, max: 50 }).withMessage('displayName must be 1-50 characters')
+  ]),
+  async (req, res) => {
   try {
     const { email, password, username, phone, countryCode, displayName } = req.body;
 
@@ -23,7 +36,17 @@ router.post('/register', async (req, res) => {
     
     if (passwordErrors.length > 0) {
       return res.status(400).json({ 
-        message: 'Password must contain: ' + passwordErrors.join(', ')
+        success: false,
+        error: 'password_validation_failed',
+        message: 'Password does not meet requirements',
+        requirements: {
+          minLength: { required: true, current: password.length },
+          hasUppercase: /[A-Z]/.test(password),
+          hasLowercase: /[a-z]/.test(password),
+          hasNumber: /[0-9]/.test(password),
+          hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        },
+        details: passwordErrors
       });
     }
 
@@ -101,7 +124,8 @@ router.post('/register', async (req, res) => {
       });
 
     res.status(201).json({
-      message: fullPhone ? 'Registration successful. Please verify your phone number.' : 'Registration successful',
+      success: true,
+      message: fullPhone ? 'Registration successful. Please verify your phone number.' : 'Registration successful. You can now log in.',
       user: {
         id: authData.user.id,
         email: authData.user.email,
@@ -109,6 +133,7 @@ router.post('/register', async (req, res) => {
         phone: fullPhone
       },
       session: authData.session,
+      nextSteps: fullPhone ? ['verify-phone'] : ['login'],
       needsPhoneVerification: !!fullPhone
     });
   } catch (error) {
@@ -118,7 +143,13 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post(
+  '/login',
+  validate([
+    body('email').exists().withMessage('email/username/phone is required').bail().isString().trim(),
+    body('password').exists().withMessage('password is required').bail().isString()
+  ]),
+  async (req, res) => {
   try {
     const { email: emailUsernameOrPhone, password } = req.body;
 
@@ -225,7 +256,7 @@ router.post('/send-phone-verification', async (req, res) => {
 
     // In production, integrate with Twilio or similar SMS service
     // For now, just return success
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationCode = crypto.randomInt(100000, 1000000).toString();
     
     // Store verification code (in production, use Redis or database with expiry)
     // For demo purposes, we'll just return it

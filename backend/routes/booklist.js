@@ -3,6 +3,10 @@ const router = express.Router();
 const { supabase } = require('../config/supabase');
 const { authenticateUser } = require('../middleware/auth.supabase');
 
+// UUID v4 validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const isValidUUID = (id) => UUID_REGEX.test(id);
+
 // Get user's booklist
 router.get('/my-booklist', authenticateUser, async (req, res) => {
   try {
@@ -35,6 +39,11 @@ router.get('/my-booklist', authenticateUser, async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
+    
+    // Validate UUID format
+    if (!isValidUUID(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID format' });
+    }
 
     const { data, error } = await supabase
       .from('user_booklist')
@@ -73,7 +82,13 @@ router.get('/by-rating/:rating', authenticateUser, async (req, res) => {
     
     const validRatings = ['devoured', 'would-read-again', 'once-was-enough', 'couldnt-put-down', 'meh'];
     if (!validRatings.includes(rating)) {
-      return res.status(400).json({ message: 'Invalid rating' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'invalid_rating',
+        message: `Invalid rating: "${rating}"`,
+        validOptions: validRatings,
+        hint: 'Choose one of the valid rating options'
+      });
     }
 
     const { data, error } = await supabase

@@ -1,19 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
-const { authenticateUser } = require('../middleware/auth.supabase');
+const { optionalAuth } = require('../middleware/auth.supabase');
 
 // Get all challenges
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     const { status = 'active', difficulty, limit = 20 } = req.query;
     const userId = req.user?.id;
+    
+    // Enforce max limit to prevent large result sets
+    const maxLimit = Math.min(parseInt(limit) || 20, 100);
 
     let query = supabase
       .from('community_challenges')
       .select('*')
       .order('start_date', { ascending: false })
-      .limit(parseInt(limit));
+      .limit(maxLimit);
 
     if (status) {
       query = query.eq('status', status);

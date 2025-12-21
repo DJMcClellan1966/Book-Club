@@ -5,8 +5,9 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Missing Supabase environment variables!');
-  console.log('Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file');
+  console.error('FATAL: Missing required Supabase environment variables.');
+  console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file');
+  process.exit(1);
 }
 
 // Optimized client configuration for speed and reliability

@@ -3,6 +3,9 @@ const axios = require('axios');
 class AIService {
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY;
+    if (!this.apiKey) {
+      console.warn('Warning: OPENAI_API_KEY not configured. AI features will be limited.');
+    }
     this.apiUrl = 'https://api.openai.com/v1/chat/completions';
     // Configuration constants
     this.MAX_DISCUSSION_TEXT_LENGTH = 4000;
@@ -17,6 +20,10 @@ class AIService {
     try {
       if (!this.apiKey) {
         console.warn('OpenAI API key not configured, skipping moderation');
+        return { flagged: false, reason: '', score: 0 };
+      }
+
+      if (!content || typeof content !== 'string') {
         return { flagged: false, reason: '', score: 0 };
       }
 
