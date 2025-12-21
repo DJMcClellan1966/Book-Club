@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review');
 const Book = require('../models/Book');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 // Get all reviews for a book
 router.get('/book/:bookId', async (req, res) => {
@@ -32,7 +32,7 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Create a new review
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const { book, rating, title, content } = req.body;
 
@@ -71,7 +71,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Update a review
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authenticateUser, async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     
@@ -109,7 +109,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // Delete a review
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authenticateUser, async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     
@@ -148,7 +148,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // Like a review
-router.post('/:id/like', authMiddleware, async (req, res) => {
+router.post('/:id/like', authenticateUser, async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     
@@ -173,7 +173,7 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
 });
 
 // Add comment to review
-router.post('/:id/comment', authMiddleware, async (req, res) => {
+router.post('/:id/comment', authenticateUser, async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     

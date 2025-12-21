@@ -3,7 +3,7 @@ const router = express.Router();
 const AIChat = require('../models/AIChat');
 const ChatMessage = require('../models/ChatMessage');
 const Subscription = require('../models/Subscription');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const aiService = require('../services/aiService');
 
 // Get subscription limits for AI chat feature
@@ -29,7 +29,7 @@ const getChatLimits = (tier) => {
 };
 
 // Get user's active chats
-router.get('/my-chats', authMiddleware, async (req, res) => {
+router.get('/my-chats', authenticateUser, async (req, res) => {
   try {
     const chats = await AIChat.find({ 
       user: req.user.userId,
@@ -46,7 +46,7 @@ router.get('/my-chats', authMiddleware, async (req, res) => {
 });
 
 // Get chat details with message history
-router.get('/:chatId', authMiddleware, async (req, res) => {
+router.get('/:chatId', authenticateUser, async (req, res) => {
   try {
     const chat = await AIChat.findOne({
       _id: req.params.chatId,
@@ -69,7 +69,7 @@ router.get('/:chatId', authMiddleware, async (req, res) => {
 });
 
 // Create a new AI chat
-router.post('/create', authMiddleware, async (req, res) => {
+router.post('/create', authenticateUser, async (req, res) => {
   try {
     const { characterName, characterType, bookId, bookTitle, enableVideo } = req.body;
 
@@ -153,7 +153,7 @@ router.post('/create', authMiddleware, async (req, res) => {
 });
 
 // Send a message in a chat
-router.post('/:chatId/message', authMiddleware, async (req, res) => {
+router.post('/:chatId/message', authenticateUser, async (req, res) => {
   try {
     const { message } = req.body;
 
@@ -251,7 +251,7 @@ router.post('/:chatId/message', authMiddleware, async (req, res) => {
 });
 
 // Delete/archive a chat
-router.delete('/:chatId', authMiddleware, async (req, res) => {
+router.delete('/:chatId', authenticateUser, async (req, res) => {
   try {
     const chat = await AIChat.findOne({
       _id: req.params.chatId,
@@ -273,7 +273,7 @@ router.delete('/:chatId', authMiddleware, async (req, res) => {
 });
 
 // Get chat limits for current user
-router.get('/limits/current', authMiddleware, async (req, res) => {
+router.get('/limits/current', authenticateUser, async (req, res) => {
   try {
     let subscription = await Subscription.findOne({ user: req.user.userId });
     if (!subscription) {

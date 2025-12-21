@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const aiService = require('../services/aiService');
 
 // Get user profile
@@ -27,7 +27,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update user profile
-router.put('/profile', authMiddleware, async (req, res) => {
+router.put('/profile', authenticateUser, async (req, res) => {
   try {
     const { username, bio, avatar } = req.body;
     
@@ -51,7 +51,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
 });
 
 // Add book to reading list
-router.post('/reading-list/:listType', authMiddleware, async (req, res) => {
+router.post('/reading-list/:listType', authenticateUser, async (req, res) => {
   try {
     const { bookId } = req.body;
     const { listType } = req.params;
@@ -97,7 +97,7 @@ router.post('/reading-list/:listType', authMiddleware, async (req, res) => {
 });
 
 // Remove book from reading list
-router.delete('/reading-list/:listType/:bookId', authMiddleware, async (req, res) => {
+router.delete('/reading-list/:listType/:bookId', authenticateUser, async (req, res) => {
   try {
     const { listType, bookId } = req.params;
 
@@ -130,7 +130,7 @@ router.delete('/reading-list/:listType/:bookId', authMiddleware, async (req, res
 });
 
 // Follow a user
-router.post('/:id/follow', authMiddleware, async (req, res) => {
+router.post('/:id/follow', authenticateUser, async (req, res) => {
   try {
     if (req.params.id === req.userId) {
       return res.status(400).json({ message: 'Cannot follow yourself' });
@@ -159,7 +159,7 @@ router.post('/:id/follow', authMiddleware, async (req, res) => {
 });
 
 // Unfollow a user
-router.post('/:id/unfollow', authMiddleware, async (req, res) => {
+router.post('/:id/unfollow', authenticateUser, async (req, res) => {
   try {
     const userToUnfollow = await User.findById(req.params.id);
     const currentUser = await User.findById(req.userId);
@@ -186,7 +186,7 @@ router.post('/:id/unfollow', authMiddleware, async (req, res) => {
 });
 
 // Get AI-powered book recommendations
-router.get('/recommendations', authMiddleware, async (req, res) => {
+router.get('/recommendations', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
       .populate('readingList.currentlyReading')
@@ -216,7 +216,7 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
 });
 
 // Get AI-powered reading insights
-router.get('/reading-insights', authMiddleware, async (req, res) => {
+router.get('/reading-insights', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
       .populate('readingList.currentlyReading')

@@ -3,7 +3,7 @@ const router = express.Router();
 const stripeService = require('../services/stripeService');
 const Subscription = require('../models/Subscription');
 const Payment = require('../models/Payment');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 // Get pricing tiers
 router.get('/pricing', (req, res) => {
@@ -16,7 +16,7 @@ router.get('/pricing', (req, res) => {
 });
 
 // Get current user's subscription
-router.get('/subscription', authMiddleware, async (req, res) => {
+router.get('/subscription', authenticateUser, async (req, res) => {
   try {
     let subscription = await Subscription.findOne({ user: req.user.userId });
     
@@ -36,7 +36,7 @@ router.get('/subscription', authMiddleware, async (req, res) => {
 });
 
 // Create a new subscription
-router.post('/subscribe', authMiddleware, async (req, res) => {
+router.post('/subscribe', authenticateUser, async (req, res) => {
   try {
     const { tier, paymentMethodId } = req.body;
     
@@ -103,7 +103,7 @@ router.post('/subscribe', authMiddleware, async (req, res) => {
 });
 
 // Cancel subscription
-router.post('/cancel', authMiddleware, async (req, res) => {
+router.post('/cancel', authenticateUser, async (req, res) => {
   try {
     const { immediately } = req.body;
     const subscription = await Subscription.findOne({ user: req.user.userId });
@@ -129,7 +129,7 @@ router.post('/cancel', authMiddleware, async (req, res) => {
 });
 
 // Reactivate subscription
-router.post('/reactivate', authMiddleware, async (req, res) => {
+router.post('/reactivate', authenticateUser, async (req, res) => {
   try {
     const subscription = await Subscription.findOne({ user: req.user.userId });
 
@@ -148,7 +148,7 @@ router.post('/reactivate', authMiddleware, async (req, res) => {
 });
 
 // Update subscription tier
-router.post('/update-tier', authMiddleware, async (req, res) => {
+router.post('/update-tier', authenticateUser, async (req, res) => {
   try {
     const { newTier } = req.body;
     const subscription = await Subscription.findOne({ user: req.user.userId });
@@ -171,7 +171,7 @@ router.post('/update-tier', authMiddleware, async (req, res) => {
 });
 
 // Get payment history
-router.get('/payments', authMiddleware, async (req, res) => {
+router.get('/payments', authenticateUser, async (req, res) => {
   try {
     const payments = await Payment.find({ user: req.user.userId })
       .sort({ createdAt: -1 })
@@ -183,7 +183,7 @@ router.get('/payments', authMiddleware, async (req, res) => {
 });
 
 // Create billing portal session
-router.post('/portal', authMiddleware, async (req, res) => {
+router.post('/portal', authenticateUser, async (req, res) => {
   try {
     const subscription = await Subscription.findOne({ user: req.user.userId });
 

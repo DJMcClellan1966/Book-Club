@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Forum = require('../models/Forum');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const aiService = require('../services/aiService');
 
 // Get all forums
@@ -44,7 +44,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new forum
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const { title, description, book, category } = req.body;
 
@@ -68,7 +68,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Join a forum
-router.post('/:id/join', authMiddleware, async (req, res) => {
+router.post('/:id/join', authenticateUser, async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.id);
     
@@ -89,7 +89,7 @@ router.post('/:id/join', authMiddleware, async (req, res) => {
 });
 
 // Add a post to forum
-router.post('/:id/posts', authMiddleware, async (req, res) => {
+router.post('/:id/posts', authenticateUser, async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.id);
     
@@ -124,7 +124,7 @@ router.post('/:id/posts', authMiddleware, async (req, res) => {
 });
 
 // Add reply to a post
-router.post('/:forumId/posts/:postId/replies', authMiddleware, async (req, res) => {
+router.post('/:forumId/posts/:postId/replies', authenticateUser, async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.forumId);
     
@@ -164,7 +164,7 @@ router.post('/:forumId/posts/:postId/replies', authMiddleware, async (req, res) 
 });
 
 // Like a post
-router.post('/:forumId/posts/:postId/like', authMiddleware, async (req, res) => {
+router.post('/:forumId/posts/:postId/like', authenticateUser, async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.forumId);
     

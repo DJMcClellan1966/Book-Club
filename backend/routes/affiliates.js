@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AffiliateClick = require('../models/AffiliateClick');
 const Book = require('../models/Book');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 // Configuration for affiliate links
 const AFFILIATE_CONFIGS = {
@@ -103,7 +103,7 @@ router.post('/track-click', async (req, res) => {
 });
 
 // Get affiliate statistics (admin only)
-router.get('/stats', authMiddleware, async (req, res) => {
+router.get('/stats', authenticateUser, async (req, res) => {
   try {
     // Check if user is admin (you'll need to add this field to User model)
     // For now, just return stats

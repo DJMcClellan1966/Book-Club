@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Space = require('../models/Space');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const aiService = require('../services/aiService');
 
 // Get all active spaces
@@ -47,7 +47,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new space
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const { name, description, type, visibility, book, hasVideoEnabled, expiresAt } = req.body;
 
@@ -81,7 +81,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Join a space
-router.post('/:id/join', authMiddleware, async (req, res) => {
+router.post('/:id/join', authenticateUser, async (req, res) => {
   try {
     const space = await Space.findById(req.params.id);
     
@@ -112,7 +112,7 @@ router.post('/:id/join', authMiddleware, async (req, res) => {
 });
 
 // Leave a space
-router.post('/:id/leave', authMiddleware, async (req, res) => {
+router.post('/:id/leave', authenticateUser, async (req, res) => {
   try {
     const space = await Space.findById(req.params.id);
     
@@ -131,7 +131,7 @@ router.post('/:id/leave', authMiddleware, async (req, res) => {
 });
 
 // Add message to space
-router.post('/:id/messages', authMiddleware, async (req, res) => {
+router.post('/:id/messages', authenticateUser, async (req, res) => {
   try {
     const space = await Space.findById(req.params.id);
     
@@ -173,7 +173,7 @@ router.post('/:id/messages', authMiddleware, async (req, res) => {
 });
 
 // Enable/disable video for space
-router.patch('/:id/video', authMiddleware, async (req, res) => {
+router.patch('/:id/video', authenticateUser, async (req, res) => {
   try {
     const space = await Space.findById(req.params.id);
     
@@ -201,7 +201,7 @@ router.patch('/:id/video', authMiddleware, async (req, res) => {
 });
 
 // Delete/deactivate space
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authenticateUser, async (req, res) => {
   try {
     const space = await Space.findById(req.params.id);
     

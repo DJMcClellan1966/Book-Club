@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 
 // Register new user
 router.post('/register', [
@@ -105,7 +105,7 @@ router.post('/login', [
 });
 
 // Get current user
-router.get('/me', authMiddleware, async (req, res) => {
+router.get('/me', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
     if (!user) {

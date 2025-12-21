@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
-const authMiddleware = require('../middleware/auth');
+const { authenticateUser } = require('../middleware/auth.supabase');
 const aiService = require('../services/aiService');
 const Review = require('../models/Review');
 const Book = require('../models/Book');
@@ -35,7 +35,7 @@ router.use(aiLimiter);
  * @desc    Analyze sentiment of text
  * @access  Private
  */
-router.post('/sentiment', authMiddleware, async (req, res) => {
+router.post('/sentiment', authenticateUser, async (req, res) => {
   try {
     const { text } = req.body;
 
@@ -137,7 +137,7 @@ router.get('/book-sentiment/:bookId', async (req, res) => {
  * @desc    Generate topic tags for text
  * @access  Private
  */
-router.post('/generate-tags', authMiddleware, async (req, res) => {
+router.post('/generate-tags', authenticateUser, async (req, res) => {
   try {
     const { text, title } = req.body;
 
@@ -183,7 +183,7 @@ router.get('/book-tags/:bookId', async (req, res) => {
  * @desc    Generate summary of text
  * @access  Private
  */
-router.post('/summarize', authMiddleware, async (req, res) => {
+router.post('/summarize', authenticateUser, async (req, res) => {
   try {
     const { text, maxLength } = req.body;
 
@@ -229,7 +229,7 @@ router.get('/book-summary/:bookId', async (req, res) => {
  * @desc    Generate summary of forum discussion
  * @access  Private
  */
-router.get('/discussion-summary/:forumId', authMiddleware, async (req, res) => {
+router.get('/discussion-summary/:forumId', authenticateUser, async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.forumId)
       .populate('posts.user', 'username');
@@ -255,7 +255,7 @@ router.get('/discussion-summary/:forumId', authMiddleware, async (req, res) => {
  * @desc    Transcribe speech to text (placeholder)
  * @access  Private
  */
-router.post('/transcribe', authMiddleware, async (req, res) => {
+router.post('/transcribe', authenticateUser, async (req, res) => {
   try {
     const { audioFilePath } = req.body;
 
@@ -276,7 +276,7 @@ router.post('/transcribe', authMiddleware, async (req, res) => {
  * @desc    Extract text from image using OCR (placeholder)
  * @access  Private
  */
-router.post('/ocr', authMiddleware, async (req, res) => {
+router.post('/ocr', authenticateUser, async (req, res) => {
   try {
     const { imageData } = req.body;
 
@@ -297,7 +297,7 @@ router.post('/ocr', authMiddleware, async (req, res) => {
  * @desc    Generate personalized notification
  * @access  Private
  */
-router.post('/notification', authMiddleware, async (req, res) => {
+router.post('/notification', authenticateUser, async (req, res) => {
   try {
     const { type, context } = req.body;
 
