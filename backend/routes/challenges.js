@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
-const { optionalAuth } = require('../middleware/auth.supabase');
+const { authenticateUser, optionalAuth } = require('../middleware/auth.supabase');
 
 // Get all challenges
 router.get('/', optionalAuth, async (req, res) => {
@@ -59,7 +59,7 @@ router.get('/', optionalAuth, async (req, res) => {
 });
 
 // Get challenge details with leaderboard
-router.get('/:challengeId', async (req, res) => {
+router.get('/:challengeId', optionalAuth, async (req, res) => {
   try {
     const { challengeId } = req.params;
     const userId = req.user?.id;
