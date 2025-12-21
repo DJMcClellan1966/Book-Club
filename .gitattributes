@@ -1,0 +1,10 @@
+# Reduce noise in diffs for generated lockfiles
+**/package-lock.json -diff
+**/yarn.lock -diff
+**/pnpm-lock.yaml -diff
+
+# Prevent giant diffs if IDE artifacts slip in
+.vs/** -diff
+**/*.db -diff
+**/*.sqlite -diff
+**/*.sqlite3 -diff

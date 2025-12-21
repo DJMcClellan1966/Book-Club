@@ -40,6 +40,7 @@ web-build/
 # IDE
 .vscode/
 .idea/
+.vs/
 *.swp
 *.swo
 *~
