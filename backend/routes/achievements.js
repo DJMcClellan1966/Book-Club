@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
-const { optionalAuth } = require('../middleware/auth.supabase');
+const { authenticateUser, optionalAuth } = require('../middleware/auth.supabase');
 
 // Get all available achievements
 router.get('/catalog', optionalAuth, async (req, res) => {
